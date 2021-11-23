@@ -322,6 +322,10 @@ OU_DEFS = [
          Feature("WorkTableScanState"),
          Feature("WorkTableScan")
      ]),
+    ("do_autovacuum",
+     [
+         Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
+     ]),
 ]
 
 # The metrics to be defined for every OU.

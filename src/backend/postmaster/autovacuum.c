@@ -96,6 +96,7 @@
 #include "storage/sinvaladt.h"
 #include "storage/smgr.h"
 #include "tcop/tcopprot.h"
+#include "tscout/marker.h"
 #include "utils/fmgroids.h"
 #include "utils/fmgrprotos.h"
 #include "utils/lsyscache.h"
@@ -352,6 +353,8 @@ static void autovac_report_workitem(AutoVacuumWorkItem *workitem,
 static void avl_sigusr2_handler(SIGNAL_ARGS);
 static void autovac_refresh_stats(void);
 
+TS_DECLARE_SEMAPHORE(fork_backend);
+TS_DEFINE_SEMAPHORE(do_autovacuum_features);
 
 
 /********************************************************************
@@ -1496,6 +1499,19 @@ StartAutoVacWorker(void)
 			/* Close the postmaster's sockets */
 			ClosePostmasterPorts(false);
 
+                        if (TS_MARKER_IS_ENABLED(fork_backend)) {
+                            SpinDelayStatus delayStatus;
+
+                            init_local_spin_delay(&delayStatus);
+
+                            while (!TS_MARKER_IS_ENABLED(do_autovacuum_features))
+                            {
+                              perform_spin_delay(&delayStatus);
+                            }
+
+                            finish_spin_delay(&delayStatus);
+                        }
+
 			AutoVacWorkerMain(0, NULL);
 			break;
 #endif
@@ -1970,6 +1986,7 @@ do_autovacuum(void)
 	bool		did_vacuum = false;
 	bool		found_concurrent_worker = false;
 	int			i;
+        TS_MARKER(do_autovacuum_begin, 15721);
 
 	/*
 	 * StartTransactionCommand and CommitTransactionCommand will automatically
@@ -2626,6 +2643,9 @@ deleted:
 
 	/* Finally close out the last transaction. */
 	CommitTransactionCommand();
+
+        TS_MARKER(do_autovacuum_end, 15721);
+        TS_MARKER_WITH_SEMAPHORE(do_autovacuum_features, 15721, (uint64_t)15445);
 }
 
 /*

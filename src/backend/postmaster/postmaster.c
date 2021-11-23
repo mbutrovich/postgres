@@ -5567,6 +5567,7 @@ StartAutovacuumWorker(void)
 			bn->pid = StartAutoVacWorker();
 			if (bn->pid > 0)
 			{
+                                TS_MARKER(fork_background, bn->pid);
 				bn->bkend_type = BACKEND_TYPE_AUTOVAC;
 				dlist_push_head(&BackendList, &bn->elem);
 #ifdef EXEC_BACKEND

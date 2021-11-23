@@ -2645,6 +2645,8 @@ perform_work_item(AutoVacuumWorkItem *workitem)
 	char	   *cur_nspname = NULL;
 	char	   *cur_relname = NULL;
 
+        TS_MARKER(perform_work_item_begin, 0);
+
 	/*
 	 * Note we do not store table info in MyWorkerInfo, since this is not
 	 * vacuuming proper.
@@ -2736,6 +2738,9 @@ deleted2:
 		pfree(cur_nspname);
 	if (cur_relname)
 		pfree(cur_relname);
+
+        TS_MARKER(perform_work_item_end, 0);
+        TS_MARKER(perform_work_item_features, 0, workitem);
 }
 
 /*

@@ -326,6 +326,10 @@ OU_DEFS = [
      [
          Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
      ]),
+    ("perform_work_item",
+     [
+         Feature("AutoVacuumWorkItem"),
+     ]),
 ]
 
 # The metrics to be defined for every OU.

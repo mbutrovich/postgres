@@ -1499,19 +1499,6 @@ StartAutoVacWorker(void)
 			/* Close the postmaster's sockets */
 			ClosePostmasterPorts(false);
 
-                        if (TS_MARKER_IS_ENABLED(fork_backend)) {
-                            SpinDelayStatus delayStatus;
-
-                            init_local_spin_delay(&delayStatus);
-
-                            while (!TS_MARKER_IS_ENABLED(do_autovacuum_features))
-                            {
-                              perform_spin_delay(&delayStatus);
-                            }
-
-                            finish_spin_delay(&delayStatus);
-                        }
-
 			AutoVacWorkerMain(0, NULL);
 			break;
 #endif

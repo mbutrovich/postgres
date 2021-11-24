@@ -5,6 +5,7 @@ Convert C types to BPF types.
 Define the Operating Units (OUs) and metrics to be collected.
 """
 
+import logging
 import struct
 import sys
 from dataclasses import dataclass
@@ -14,6 +15,8 @@ from typing import List, Mapping, Tuple
 import clang.cindex
 
 import clang_parser
+
+logger = logging.getLogger('tscout')
 
 
 @unique
@@ -527,9 +530,10 @@ class Model:
                             )
                         )
                     except KeyError as e:
-                        print(
-                            'No mapping from Clang type {} to BPF for field {} in the struct {}.'.format(e, field.name,
-                                                                                                         feature.name))
+                        logger.critical(
+                            'No mapping from Clang to BPF for type {} for field {} in the struct {}.'.format(e,
+                                                                                                             field.name,
+                                                                                                             feature.name))
                         exit()
                 new_feature = Feature(feature.name,
                                       bpf_tuple=tuple(bpf_fields),

@@ -3242,7 +3242,6 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 	RangeVar   *rangevar;
 	VacuumRelation *rel;
 	List	   *rel_list;
-
         TS_MARKER(autovacuum_do_vac_analyze_begin, 0);
 
 	/* Let pgstat know what we're doing */
@@ -3255,6 +3254,7 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 
 	vacuum(rel_list, &tab->at_params, bstrategy, true);
         TS_MARKER(autovacuum_do_vac_analyze_end, 0);
+
         TS_MARKER(autovacuum_do_vac_analyze_features, 0, tab, bstrategy);
 }
 

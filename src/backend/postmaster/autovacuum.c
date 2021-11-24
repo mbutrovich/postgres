@@ -1973,7 +1973,7 @@ do_autovacuum(void)
 	bool		did_vacuum = false;
 	bool		found_concurrent_worker = false;
 	int			i;
-        TS_MARKER(do_autovacuum_begin, 15721);
+        TS_MARKER(do_autovacuum_begin, 0);
 
 	/*
 	 * StartTransactionCommand and CommitTransactionCommand will automatically
@@ -2631,8 +2631,8 @@ deleted:
 	/* Finally close out the last transaction. */
 	CommitTransactionCommand();
 
-        TS_MARKER(do_autovacuum_end, 15721);
-        TS_MARKER_WITH_SEMAPHORE(do_autovacuum_features, 15721, (uint64_t)15445);
+        TS_MARKER(do_autovacuum_end, 0);
+        TS_MARKER_WITH_SEMAPHORE(do_autovacuum_features, 0, (uint64_t)15445);
 }
 
 /*
@@ -3243,6 +3243,8 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 	VacuumRelation *rel;
 	List	   *rel_list;
 
+        TS_MARKER(autovacuum_do_vac_analyze_begin, 0);
+
 	/* Let pgstat know what we're doing */
 	autovac_report_activity(tab);
 
@@ -3252,6 +3254,8 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 	rel_list = list_make1(rel);
 
 	vacuum(rel_list, &tab->at_params, bstrategy, true);
+        TS_MARKER(autovacuum_do_vac_analyze_end, 0);
+        TS_MARKER(autovacuum_do_vac_analyze_features, 0, tab, bstrategy);
 }
 
 /*

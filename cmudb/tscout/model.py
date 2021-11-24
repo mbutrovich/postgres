@@ -27,6 +27,7 @@ class BPFType(str, Enum):
     u16 = "u16"
     u32 = "u32"
     u64 = "u64"
+    pointer = "void *"
 
 
 @dataclass
@@ -330,6 +331,11 @@ OU_DEFS = [
      [
          Feature("AutoVacuumWorkItem"),
      ]),
+    ("autovacuum_do_vac_analyze",
+     [
+         Feature("autovac_table"),
+         Feature("BufferAccessStrategyData"),
+     ]),
 ]
 
 # The metrics to be defined for every OU.
@@ -492,8 +498,9 @@ class Model:
         clang.cindex.TypeKind.FLOAT: BPFType.u32,
         clang.cindex.TypeKind.DOUBLE: BPFType.u64,
         clang.cindex.TypeKind.ENUM: BPFType.i32,
-        clang.cindex.TypeKind.POINTER: BPFType.u64,
-        clang.cindex.TypeKind.FUNCTIONPROTO: BPFType.u64,
+        clang.cindex.TypeKind.POINTER: BPFType.pointer,
+        clang.cindex.TypeKind.FUNCTIONPROTO: BPFType.pointer,
+        clang.cindex.TypeKind.INCOMPLETEARRAY: BPFType.pointer,
     }
 
     def __init__(self):
@@ -509,17 +516,23 @@ class Model:
                     feature_list.append(feature)
                     continue
                 # Otherwise, convert the list of fields to BPF types.
-                bpf_fields = tuple([
-                    BPFVariable(
-                        bpf_type=Model.CLANG_TO_BPF[field.canonical_type_kind],
-                        name=field.name,
-                        c_type=field.canonical_type_kind,
-                    )
-                    for i, field in enumerate(nodes.field_map[feature.name])
-                ])
-
+                bpf_fields: List[BPFVariable] = []
+                for i, field in enumerate(nodes.field_map[feature.name]):
+                    try:
+                        bpf_fields.append(
+                            BPFVariable(
+                                bpf_type=Model.CLANG_TO_BPF[field.canonical_type_kind],
+                                name=field.name,
+                                c_type=field.canonical_type_kind,
+                            )
+                        )
+                    except KeyError as e:
+                        print(
+                            'No mapping from Clang type {} to BPF for field {} in the struct {}.'.format(e, field.name,
+                                                                                                         feature.name))
+                        exit()
                 new_feature = Feature(feature.name,
-                                      bpf_tuple=bpf_fields,
+                                      bpf_tuple=tuple(bpf_fields),
                                       readarg_p=True)
                 feature_list.append(new_feature)
 

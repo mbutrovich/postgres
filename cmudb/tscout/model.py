@@ -53,6 +53,7 @@ class BPFVariable:
         suppressed = [
             clang.cindex.TypeKind.POINTER,
             clang.cindex.TypeKind.FUNCTIONPROTO,
+            clang.cindex.TypeKind.INCOMPLETEARRAY,
         ]
         return self.c_type not in suppressed
 

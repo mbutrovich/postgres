@@ -169,7 +169,7 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
             training_data = ''.join([
                 event_features,
                 ',',
-                ','.join(str(getattr(raw_data, metric.name))
+                ','.join(metric.serialize(raw_data)
                          for metric in metrics),
                 '\n'
             ])

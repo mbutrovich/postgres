@@ -11,12 +11,15 @@ import sys
 from dataclasses import dataclass
 from enum import Enum, unique
 from typing import List, Mapping, Tuple
+import time
 
 import clang.cindex
 
 import clang_parser
 
 logger = logging.getLogger('tscout')
+
+START_TIME: int = time.time_ns() - time.monotonic_ns()
 
 
 @unique
@@ -75,6 +78,8 @@ class BPFVariable:
             return str(struct.unpack('f', getattr(output_event, self.name).to_bytes(4, byteorder=sys.byteorder))[0])
         elif self.c_type == clang.cindex.TypeKind.DOUBLE:
             return str(struct.unpack('d', getattr(output_event, self.name).to_bytes(8, byteorder=sys.byteorder))[0])
+        elif self.name == 'start_time' or self.name == 'end_time':
+            return str(getattr(output_event, self.name) + START_TIME)
         else:
             return str(getattr(output_event, self.name))
 
@@ -510,6 +515,9 @@ class Model:
     def __init__(self):
         nodes = clang_parser.ClangParser()
         operating_units = []
+
+        print(START_TIME)
+
         for postgres_function, features in OU_DEFS:
             feature_list = []
             for feature in features:

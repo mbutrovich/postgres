@@ -23,8 +23,8 @@ void SUBST_OU_begin(struct pt_regs *ctx) {
   net_start(&metrics, p, CLIENT_SOCKET_FD);
 #endif
 
-  // Collect a start time after probes are complete, converting from nanoseconds to microseconds
-  metrics.start_time = (bpf_ktime_get_ns() >> 10);
+  // Collect a start time after probes are complete
+  metrics.start_time = bpf_ktime_get_ns();
 
   // Store the start metrics in the subsystem map, waiting for end
   s32 plan_node_id;
@@ -50,9 +50,10 @@ void SUBST_OU_end(struct pt_regs *ctx) {
     return;
   }
 
-  // Collect an end time before probes are complete, converting from nanoseconds to microseconds
-  metrics->end_time = (bpf_ktime_get_ns() >> 10);
-  metrics->elapsed_us = (metrics->end_time - metrics->start_time);
+  // Collect an end time before probes are complete
+  metrics->end_time = bpf_ktime_get_ns();
+  // Compute elapsed time, converting from nanoseconds to microseconds
+  metrics->elapsed_us = (metrics->end_time - metrics->start_time)  >> 10;
 
   // Probe for CPU counters
   if (!cpu_end(metrics)) {

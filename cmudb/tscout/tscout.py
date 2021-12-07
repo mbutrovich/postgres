@@ -345,7 +345,7 @@ if __name__ == '__main__':
             ou_processors.append(ou_processor)
 
 
-        def create_collector(child_pid, socket_fd):
+        def create_collector(child_pid, socket_fd = None):
             logger.info(f"Postmaster forked PID {child_pid}, "
                         f"creating its Collector.")
             collector_flags[child_pid] = True
@@ -383,6 +383,11 @@ if __name__ == '__main__':
                 logger.error("Unknown event type from Postmaster.")
                 raise KeyboardInterrupt
 
+
+        # Attach to the persistent background workers.
+        create_collector(postgres.walwriter_pid)
+        create_collector(postgres.bgwriter_pid)
+        create_collector(postgres.checkpointer_pid)
 
         tscout_bpf["postmaster_events"].open_perf_buffer(
             callback=postmaster_event, lost_cb=lost_something)

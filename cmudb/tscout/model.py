@@ -479,9 +479,6 @@ class Model:
     def __init__(self):
         nodes = clang_parser.ClangParser()
         operating_units = []
-
-        print(START_TIME)
-
         for postgres_function, features in OU_DEFS:
             feature_list = []
             for feature in features:

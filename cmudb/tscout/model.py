@@ -57,6 +57,7 @@ class BPFVariable:
             clang.cindex.TypeKind.POINTER,
             clang.cindex.TypeKind.FUNCTIONPROTO,
             clang.cindex.TypeKind.INCOMPLETEARRAY,
+            clang.cindex.TypeKind.CONSTANTARRAY,
         ]
         return self.c_type not in suppressed
 
@@ -298,13 +299,24 @@ OU_DEFS = [
      ]),
     ("vacuum_rel",
      [
-         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.ULONG),)),
+         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
          Feature("VacuumParams")
      ]),
     ("analyze_rel",
      [
-         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.ULONG),)),
-         Feature("VacuumParams")
+         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
+         Feature("VacuumParams"),
+         Feature("in_outer_xact", readarg_p=False,
+                 bpf_tuple=(BPFVariable(BPFType.u8, "in_outer_xact", clang.cindex.TypeKind.BOOL),)),
+         Feature("BufferAccessStrategyData"),
+     ]),
+    ("SyncOneBuffer",
+     [
+         Feature("buf_state", readarg_p=False,
+                 bpf_tuple=(BPFVariable(BPFType.u32, "buf_state", clang.cindex.TypeKind.UINT),)),
+         Feature("skip_recently_used", readarg_p=False,
+                 bpf_tuple=(BPFVariable(BPFType.u8, "skip_recently_used", clang.cindex.TypeKind.BOOL),)),
+         Feature("WritebackContext")
      ]),
 ]
 
@@ -471,6 +483,7 @@ class Model:
         clang.cindex.TypeKind.POINTER: BPFType.pointer,
         clang.cindex.TypeKind.FUNCTIONPROTO: BPFType.pointer,
         clang.cindex.TypeKind.INCOMPLETEARRAY: BPFType.pointer,
+        clang.cindex.TypeKind.CONSTANTARRAY: BPFType.pointer,
     }
 
     def __init__(self):

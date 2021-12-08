@@ -290,7 +290,7 @@ void analyze_rel(Oid relid, RangeVar *relation, VacuumParams *params,
 
   TS_MARKER(analyze_rel_end, 0);
 
-  TS_MARKER(analyze_rel_features, 0, relid, params);
+  TS_MARKER(analyze_rel_features, 0, relid, params, in_outer_xact, bstrategy);
 }
 
 /*

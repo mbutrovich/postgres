@@ -345,7 +345,7 @@ if __name__ == '__main__':
             ou_processors.append(ou_processor)
 
 
-        def create_collector(child_pid, socket_fd):
+        def create_collector(child_pid, socket_fd = None):
             logger.info(f"Postmaster forked PID {child_pid}, "
                         f"creating its Collector.")
             collector_flags[child_pid] = True

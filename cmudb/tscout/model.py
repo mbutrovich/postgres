@@ -296,6 +296,16 @@ OU_DEFS = [
          Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
          Feature("WorkTableScan")
      ]),
+    ("vacuum_rel",
+     [
+         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.ULONG),)),
+         Feature("VacuumParams")
+     ]),
+    ("analyze_rel",
+     [
+         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.ULONG),)),
+         Feature("VacuumParams")
+     ]),
 ]
 
 # The metrics to be defined for every OU.

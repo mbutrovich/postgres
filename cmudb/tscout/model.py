@@ -296,19 +296,6 @@ OU_DEFS = [
          Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
          Feature("WorkTableScan")
      ]),
-    ("do_autovacuum",
-     [
-         Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
-     ]),
-    ("perform_work_item",
-     [
-         Feature("AutoVacuumWorkItem"),
-     ]),
-    ("autovacuum_do_vac_analyze",
-     [
-         Feature("autovac_table"),
-         Feature("BufferAccessStrategyData"),
-     ]),
 ]
 
 # The metrics to be defined for every OU.
@@ -506,7 +493,7 @@ class Model:
                                                                                                              feature.name))
                         exit()
                 new_feature = Feature(feature.name,
-                                      bpf_tuple=tuple(bpf_fields),
+                                      bpf_tuple=bpf_fields,
                                       readarg_p=True)
                 feature_list.append(new_feature)
 

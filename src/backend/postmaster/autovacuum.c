@@ -96,7 +96,6 @@
 #include "storage/sinvaladt.h"
 #include "storage/smgr.h"
 #include "tcop/tcopprot.h"
-#include "tscout/marker.h"
 #include "utils/fmgroids.h"
 #include "utils/fmgrprotos.h"
 #include "utils/lsyscache.h"
@@ -353,8 +352,6 @@ static void autovac_report_workitem(AutoVacuumWorkItem *workitem,
 static void avl_sigusr2_handler(SIGNAL_ARGS);
 static void autovac_refresh_stats(void);
 
-TS_DECLARE_SEMAPHORE(fork_backend);
-TS_DEFINE_SEMAPHORE(do_autovacuum_features);
 
 
 /********************************************************************
@@ -1973,7 +1970,6 @@ do_autovacuum(void)
 	bool		did_vacuum = false;
 	bool		found_concurrent_worker = false;
 	int			i;
-        TS_MARKER(do_autovacuum_begin, 0);
 
 	/*
 	 * StartTransactionCommand and CommitTransactionCommand will automatically
@@ -2630,9 +2626,6 @@ deleted:
 
 	/* Finally close out the last transaction. */
 	CommitTransactionCommand();
-
-        TS_MARKER(do_autovacuum_end, 0);
-        TS_MARKER_WITH_SEMAPHORE(do_autovacuum_features, 0, (uint64_t)15445);
 }
 
 /*
@@ -2644,8 +2637,6 @@ perform_work_item(AutoVacuumWorkItem *workitem)
 	char	   *cur_datname = NULL;
 	char	   *cur_nspname = NULL;
 	char	   *cur_relname = NULL;
-
-        TS_MARKER(perform_work_item_begin, 0);
 
 	/*
 	 * Note we do not store table info in MyWorkerInfo, since this is not
@@ -2738,9 +2729,6 @@ deleted2:
 		pfree(cur_nspname);
 	if (cur_relname)
 		pfree(cur_relname);
-
-        TS_MARKER(perform_work_item_end, 0);
-        TS_MARKER(perform_work_item_features, 0, workitem);
 }
 
 /*
@@ -3242,7 +3230,6 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 	RangeVar   *rangevar;
 	VacuumRelation *rel;
 	List	   *rel_list;
-        TS_MARKER(autovacuum_do_vac_analyze_begin, 0);
 
 	/* Let pgstat know what we're doing */
 	autovac_report_activity(tab);
@@ -3253,9 +3240,6 @@ autovacuum_do_vac_analyze(autovac_table *tab, BufferAccessStrategy bstrategy)
 	rel_list = list_make1(rel);
 
 	vacuum(rel_list, &tab->at_params, bstrategy, true);
-        TS_MARKER(autovacuum_do_vac_analyze_end, 0);
-
-        TS_MARKER(autovacuum_do_vac_analyze_features, 0, tab, bstrategy);
 }
 
 /*

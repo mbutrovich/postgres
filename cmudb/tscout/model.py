@@ -297,27 +297,38 @@ OU_DEFS = [
          Feature("QueryId", readarg_p=False, bpf_tuple=QUERY_ID),
          Feature("WorkTableScan")
      ]),
-    ("vacuum_rel",
+    ("do_autovacuum",
      [
          Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
-         Feature("VacuumParams")
+         Feature("AutoVacOpts"),
+         Feature("FormData_pg_class"),
+         Feature("PgStat_StatTabEntry"),
+         Feature("effective_multixact_freeze_max_age", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "effective_multixact_freeze_max_age", clang.cindex.TypeKind.UINT),)),
+         Feature("dovacuum", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "dovacuum", clang.cindex.TypeKind.BOOL),)),
+         Feature("doanalyze", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "doanalyze", clang.cindex.TypeKind.BOOL),)),
+         Feature("bool", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "wraparound", clang.cindex.TypeKind.BOOL),)),
      ]),
-    ("analyze_rel",
-     [
-         Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
-         Feature("VacuumParams"),
-         Feature("in_outer_xact", readarg_p=False,
-                 bpf_tuple=(BPFVariable(BPFType.u8, "in_outer_xact", clang.cindex.TypeKind.BOOL),)),
-         Feature("BufferAccessStrategyData"),
-     ]),
-    ("SyncOneBuffer",
-     [
-         Feature("buf_state", readarg_p=False,
-                 bpf_tuple=(BPFVariable(BPFType.u32, "buf_state", clang.cindex.TypeKind.UINT),)),
-         Feature("skip_recently_used", readarg_p=False,
-                 bpf_tuple=(BPFVariable(BPFType.u8, "skip_recently_used", clang.cindex.TypeKind.BOOL),)),
-         Feature("WritebackContext")
-     ]),
+    # ("vacuum_rel",
+    #  [
+    #      Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
+    #      Feature("VacuumParams")
+    #  ]),
+    # ("analyze_rel",
+    #  [
+    #      Feature("relid", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "relid", clang.cindex.TypeKind.UINT),)),
+    #      Feature("VacuumParams"),
+    #      Feature("in_outer_xact", readarg_p=False,
+    #              bpf_tuple=(BPFVariable(BPFType.u8, "in_outer_xact", clang.cindex.TypeKind.BOOL),)),
+    #      Feature("BufferAccessStrategyData"),
+    #  ]),
+    # ("SyncOneBuffer",
+    #  [
+    #      Feature("buf_state", readarg_p=False,
+    #              bpf_tuple=(BPFVariable(BPFType.u32, "buf_state", clang.cindex.TypeKind.UINT),)),
+    #      Feature("skip_recently_used", readarg_p=False,
+    #              bpf_tuple=(BPFVariable(BPFType.u8, "skip_recently_used", clang.cindex.TypeKind.BOOL),)),
+    #      Feature("WritebackContext")
+    #  ]),
 ]
 
 # The metrics to be defined for every OU.

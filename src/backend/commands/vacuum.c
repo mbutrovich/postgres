@@ -47,7 +47,6 @@
 #include "storage/lmgr.h"
 #include "storage/proc.h"
 #include "storage/procarray.h"
-#include "tscout/marker.h"
 #include "utils/acl.h"
 #include "utils/fmgroids.h"
 #include "utils/guc.h"
@@ -1796,7 +1795,7 @@ vac_truncate_clog(TransactionId frozenXID,
  *		At entry and exit, we are not inside a transaction.
  */
 static bool
-Wrappedvacuum_rel(Oid relid, RangeVar *relation, VacuumParams *params)
+vacuum_rel(Oid relid, RangeVar *relation, VacuumParams *params)
 {
 	LOCKMODE	lmode;
 	Relation	rel;
@@ -2069,18 +2068,6 @@ Wrappedvacuum_rel(Oid relid, RangeVar *relation, VacuumParams *params)
 	return true;
 }
 
-static bool vacuum_rel(Oid relid, RangeVar *relation, VacuumParams *params) {
-  bool result;
-  TS_MARKER(vacuum_rel_begin, 0);
-
-  result = Wrappedvacuum_rel(relid, relation, params);
-
-  TS_MARKER(vacuum_rel_end, 0);
-
-  TS_MARKER(vacuum_rel_features, 0, relid, params);
-
-  return result;
-}
 
 /*
  * Open all the vacuumable indexes of the given relation, obtaining the

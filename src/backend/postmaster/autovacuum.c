@@ -96,6 +96,7 @@
 #include "storage/sinvaladt.h"
 #include "storage/smgr.h"
 #include "tcop/tcopprot.h"
+#include "tscout/marker.h"
 #include "utils/fmgroids.h"
 #include "utils/fmgrprotos.h"
 #include "utils/lsyscache.h"
@@ -2123,8 +2124,13 @@ do_autovacuum(void)
 								  &dovacuum, &doanalyze, &wraparound);
 
 		/* Relations that need work are added to table_oids */
-		if (dovacuum || doanalyze)
+		if (dovacuum || doanalyze) {
+                        TS_MARKER(do_autovacuum_features, relid, relid, relopts,
+                            classForm, tabentry,
+                            effective_multixact_freeze_max_age, dovacuum,
+                            doanalyze, wraparound);
 			table_oids = lappend_oid(table_oids, relid);
+                }
 
 		/*
 		 * Remember TOAST associations for the second pass.  Note: we must do
@@ -2206,8 +2212,12 @@ do_autovacuum(void)
 								  &dovacuum, &doanalyze, &wraparound);
 
 		/* ignore analyze for toast tables */
-		if (dovacuum)
+		if (dovacuum) {
+                        TS_MARKER(do_autovacuum_features, relid, relid, relopts,
+                            classForm, tabentry,
+                            effective_multixact_freeze_max_age, dovacuum, doanalyze, wraparound);
 			table_oids = lappend_oid(table_oids, relid);
+                }
 	}
 
 	table_endscan(relScan);
@@ -2476,6 +2486,8 @@ do_autovacuum(void)
 		if (!tab->at_relname || !tab->at_nspname || !tab->at_datname)
 			goto deleted;
 
+                TS_MARKER(do_autovacuum_begin, relid);
+
 		/*
 		 * We will abort vacuuming the current table if something errors out,
 		 * and continue with the next one in schedule; in particular, this
@@ -2522,6 +2534,9 @@ do_autovacuum(void)
 			RESUME_INTERRUPTS();
 		}
 		PG_END_TRY();
+
+                TS_MARKER(do_autovacuum_end, relid);
+                TS_MARKER(do_autovacuum_flush, relid);
 
 		/* Make sure we're back in AutovacMemCxt */
 		MemoryContextSwitchTo(AutovacMemCxt);

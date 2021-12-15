@@ -166,6 +166,10 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     num_cpus = len(utils.get_online_cpus())
     collector_c = collector_c.replace("MAX_CPUS", str(num_cpus))
 
+    print(ou.features_list[0].bpf_tuple[0].name)
+    print(collector_c)
+    exit()
+
     # Attach USDT probes to the target PID.
     collector_probes = USDT(pid=pid)
     for ou in operating_units:
@@ -387,9 +391,9 @@ if __name__ == '__main__':
 
 
         # Attach to the persistent background workers.
-        create_collector(postgres.walwriter_pid)
-        create_collector(postgres.bgwriter_pid)
-        create_collector(postgres.checkpointer_pid)
+        # create_collector(postgres.walwriter_pid)
+        # create_collector(postgres.bgwriter_pid)
+        # create_collector(postgres.checkpointer_pid)
 
         tscout_bpf["postmaster_events"].open_perf_buffer(
             callback=postmaster_event, lost_cb=lost_something)

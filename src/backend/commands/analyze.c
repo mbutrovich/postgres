@@ -52,7 +52,6 @@
 #include "storage/lmgr.h"
 #include "storage/proc.h"
 #include "storage/procarray.h"
-#include "tscout/marker.h"
 #include "utils/acl.h"
 #include "utils/attoptcache.h"
 #include "utils/builtins.h"
@@ -117,8 +116,8 @@ static Datum ind_fetch_func(VacAttrStatsP stats, int rownum, bool *isNull);
  * the name therein for reporting any failure to open/lock the rel; do not
  * use it once we've successfully opened the rel, since it might be stale.
  */
-static void
-Wrappedanalyze_rel(Oid relid, RangeVar *relation,
+void
+analyze_rel(Oid relid, RangeVar *relation,
 			VacuumParams *params, List *va_cols, bool in_outer_xact,
 			BufferAccessStrategy bstrategy)
 {
@@ -278,19 +277,6 @@ Wrappedanalyze_rel(Oid relid, RangeVar *relation,
 	relation_close(onerel, NoLock);
 
 	pgstat_progress_end_command();
-}
-
-void analyze_rel(Oid relid, RangeVar *relation, VacuumParams *params,
-                 List *va_cols, bool in_outer_xact,
-                 BufferAccessStrategy bstrategy) {
-  TS_MARKER(analyze_rel_begin, 0);
-
-  Wrappedanalyze_rel(relid, relation, params, va_cols, in_outer_xact,
-                     bstrategy);
-
-  TS_MARKER(analyze_rel_end, 0);
-
-  TS_MARKER(analyze_rel_features, 0, relid, params, in_outer_xact, bstrategy);
 }
 
 /*

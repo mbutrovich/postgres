@@ -20,8 +20,7 @@ POSTGRES_PATH = r'../..'
 # Path to the Postgres files to parse.
 POSTGRES_FILES = (
     f'{POSTGRES_PATH}/src/backend/executor/execMain.c',
-    f'{POSTGRES_PATH}/src/backend/commands/vacuum.c',
-    f'{POSTGRES_PATH}/src/backend/commands/analyze.c',
+    f'{POSTGRES_PATH}/src/backend/postmaster/autovacuum.c',
     f'{POSTGRES_PATH}/src/backend/storage/buffer/bufmgr.c',
     f'{POSTGRES_PATH}/src/backend/storage/buffer/freelist.c'
 )

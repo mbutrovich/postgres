@@ -306,7 +306,7 @@ OU_DEFS = [
          Feature("effective_multixact_freeze_max_age", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u32, "effective_multixact_freeze_max_age", clang.cindex.TypeKind.UINT),)),
          Feature("dovacuum", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "dovacuum", clang.cindex.TypeKind.BOOL),)),
          Feature("doanalyze", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "doanalyze", clang.cindex.TypeKind.BOOL),)),
-         Feature("bool", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "wraparound", clang.cindex.TypeKind.BOOL),)),
+         # Feature("bool", readarg_p=False, bpf_tuple=(BPFVariable(BPFType.u8, "wraparound", clang.cindex.TypeKind.BOOL),)),
      ]),
     # ("vacuum_rel",
     #  [

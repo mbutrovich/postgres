@@ -101,6 +101,7 @@ class Feature:
     name: str
     readarg_p: bool = None
     bpf_tuple: Tuple[BPFVariable] = None
+    alignment: int = None
 
 
 QUERY_ID = (BPFVariable(BPFType.u64, "query_id", clang.cindex.TypeKind.ULONG),)
@@ -301,7 +302,7 @@ OU_DEFS = [
      [
          Feature("PgStat_StatTabEntry"),
          Feature("effective_multixact_freeze_max_age", readarg_p=False, bpf_tuple=(
-         BPFVariable(BPFType.u32, "effective_multixact_freeze_max_age", clang.cindex.TypeKind.UINT),)),
+             BPFVariable(BPFType.u32, "effective_multixact_freeze_max_age", clang.cindex.TypeKind.UINT),)),
          Feature("relnatts", readarg_p=False,
                  bpf_tuple=(BPFVariable(BPFType.i16, "relnatts", clang.cindex.TypeKind.SHORT),)),
          Feature("dovacuum", readarg_p=False,
@@ -342,9 +343,6 @@ OU_METRICS = (
     BPFVariable(bpf_type=BPFType.u64,
                 name="end_time",
                 c_type=clang.cindex.TypeKind.ULONG),
-    BPFVariable(bpf_type=BPFType.u8,
-                name="cpu_id",
-                c_type=clang.cindex.TypeKind.UCHAR),
     BPFVariable(bpf_type=BPFType.u64,
                 name="cpu_cycles",
                 c_type=clang.cindex.TypeKind.ULONG),
@@ -377,7 +375,10 @@ OU_METRICS = (
                 c_type=clang.cindex.TypeKind.ULONG),
     BPFVariable(bpf_type=BPFType.u64,
                 name="elapsed_us",
-                c_type=clang.cindex.TypeKind.ULONG)
+                c_type=clang.cindex.TypeKind.ULONG),
+    BPFVariable(bpf_type=BPFType.u8,
+                name="cpu_id",
+                c_type=clang.cindex.TypeKind.UCHAR),
 )
 
 
@@ -418,34 +419,23 @@ class OperatingUnit:
         C struct definition of all the features in the OU.
         """
 
-        # test_struct = ''
-        # alignment = 0
-        # padding = 0
-        #
-        # for feature in self.features_list:
-        #     if feature.readarg_p:
-        #         assert (0 <= alignment < 8), 'Something went wrong if alignment is >= 8.'
-        #         if alignment != 0:
-        #             test_struct = test_struct + ('char padding{}[{}];\n'.format(padding, 8 - alignment))
-        #             padding = padding + 1
-        #             alignment = 0
-        #         for column in feature.bpf_tuple:
-        #             test_struct = test_struct + ('{} {};\n'.format(column.bpf_type, column.name))
-        #             alignment = (alignment + BPFTYPE_SIZE[column.bpf_type]) % 8
-        #     else:
-        #         assert (len(feature.bpf_tuple) == 1), 'How can something not using readarg_p have multiple fields?'
-        #         test_struct = test_struct + (
-        #             '{} {};\n'.format(feature.bpf_tuple[0].bpf_type, feature.bpf_tuple[0].name))
-        #         alignment = (alignment + BPFTYPE_SIZE[feature.bpf_tuple[0].bpf_type]) % 8
-        #
-        # return test_struct
+        struct_def = ''
 
-        struct_def = ';\n'.join(
-            '{} {}'.format(column.bpf_type, column.name)
-            for feature in self.features_list
-            for column in feature.bpf_tuple
-        )
-        return struct_def + ';'
+        for feature in self.features_list:
+            if feature.readarg_p:
+                # This Feature is actually a struct struct that readarg_p will memcpy from user-space.
+                assert (feature.alignment is not None), 'Feature is a struct, so it needs alignment information.'
+                # Add all of the struct's fields, sticking the original struct's alignment value on the first attribute.
+                for i, column in enumerate(feature.bpf_tuple):
+                    alignment_string = '__attribute__((aligned ({})))'.format(feature.alignment) if i == 0 else ''
+                    struct_def = struct_def + ('{} {} {};\n'.format(column.bpf_type, column.name, alignment_string))
+            else:
+                # It's a single stack-allocated argument that we can read directly.
+                assert (len(feature.bpf_tuple) == 1), 'How can something not using readarg_p have multiple fields?'
+                struct_def = struct_def + (
+                    '{} {};\n'.format(feature.bpf_tuple[0].bpf_type, feature.bpf_tuple[0].name))
+
+        return struct_def
 
     def features_columns(self) -> str:
         """
@@ -539,8 +529,9 @@ class Model:
                     feature_list.append(feature)
                     continue
                 # Otherwise, convert the list of fields to BPF types.
+                struct_info = nodes.struct_map[feature.name]
                 bpf_fields: List[BPFVariable] = []
-                for i, field in enumerate(nodes.field_map[feature.name]):
+                for i, field in enumerate(struct_info.fields):
                     try:
                         bpf_fields.append(
                             BPFVariable(
@@ -557,7 +548,7 @@ class Model:
                         exit()
                 new_feature = Feature(feature.name,
                                       bpf_tuple=bpf_fields,
-                                      readarg_p=True)
+                                      readarg_p=True, alignment=struct_info.alignment)
                 feature_list.append(new_feature)
 
             new_ou = OperatingUnit(postgres_function, feature_list)

@@ -2125,9 +2125,10 @@ do_autovacuum(void)
 
 		/* Relations that need work are added to table_oids */
 		if (dovacuum || doanalyze) {
-                        TS_MARKER(do_autovacuum_features, relid, relid, relopts,
-                            classForm, tabentry,
-                            effective_multixact_freeze_max_age, dovacuum, doanalyze);
+                        TS_MARKER(do_autovacuum_features, relid, tabentry,
+                            effective_multixact_freeze_max_age,
+                            classForm->relnatts, dovacuum, doanalyze,
+                            wraparound);
 			table_oids = lappend_oid(table_oids, relid);
                 }
 
@@ -2212,9 +2213,10 @@ do_autovacuum(void)
 
 		/* ignore analyze for toast tables */
 		if (dovacuum) {
-                  TS_MARKER(do_autovacuum_features, relid, relid, relopts,
-                            classForm, tabentry,
-                            effective_multixact_freeze_max_age, dovacuum, doanalyze);
+                  TS_MARKER(do_autovacuum_features, relid, tabentry,
+                            effective_multixact_freeze_max_age,
+                            classForm->relnatts, dovacuum, doanalyze,
+                            wraparound);
 			table_oids = lappend_oid(table_oids, relid);
                 }
 	}

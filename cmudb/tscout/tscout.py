@@ -94,7 +94,7 @@ def generate_readargs(feature_list):
         bpf_usdt_readarg() and bpf_usdt_readarg_p() invocations.
     """
     code = []
-    non_feature_usdt_args = 1  # Currently just plan_node_id. If any other non-feature args are added, increment this.
+    non_feature_usdt_args = 1  # Currently just ou_instance. If any other non-feature args are added, increment this.
     for idx, feature in enumerate(feature_list, 1):
         first_member = feature.bpf_tuple[0].name
         if feature.readarg_p:

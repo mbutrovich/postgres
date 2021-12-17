@@ -4,9 +4,9 @@ struct SUBST_OU_features {
 };
 
 struct SUBST_OU_output {
+  u32 ou_index;
   SUBST_FEATURES;  // Replaced by a list of the features for this subsystem
   SUBST_METRICS;   // Replaced by the list of metrics
-  u32 ou_index;    // TODO(Matt): DOCUMENT THIS IN THE PADDING ASSUMPTION
 };
 
 // Stores features for a training data point, waiting for BEGIN, END, and FLUSH.
@@ -43,8 +43,8 @@ void SUBST_OU_begin(struct pt_regs *ctx) {
   net_start(&metrics, p, CLIENT_SOCKET_FD);
 #endif
 
-  // Collect a start time after probes are complete
-  metrics.start_time = bpf_ktime_get_ns();
+  // Collect a start time after probes are complete, converting from nanoseconds to microseconds
+  metrics.start_time = (bpf_ktime_get_ns() >> 10);
 
   // Store the start metrics in the map, waiting for END.
   running_metrics.update(&key, &metrics);
@@ -66,10 +66,9 @@ void SUBST_OU_end(struct pt_regs *ctx) {
   // TODO(Matt): Consider snapshotting end metrics before doing any other work in this Marker. I don't think work before
   // this is enough to greatly alter measurements, but if it gets any more complicated...
 
-  // Collect an end time before probes are complete
-  metrics->end_time = bpf_ktime_get_ns();
-  // Compute elapsed time, converting from nanoseconds to microseconds
-  metrics->elapsed_us = (metrics->end_time - metrics->start_time) >> 10;
+  // Collect an end time before probes are complete, converting from nanoseconds to microseconds.
+  metrics->end_time = (bpf_ktime_get_ns() >> 10);
+  metrics->elapsed_us = (metrics->end_time - metrics->start_time);
 
   // Probe for CPU counters
   if (!cpu_end(metrics)) {

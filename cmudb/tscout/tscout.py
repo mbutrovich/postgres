@@ -388,10 +388,10 @@ if __name__ == '__main__':
                 raise KeyboardInterrupt
 
 
-        # Attach to the persistent background workers.
-        # create_collector(postgres.walwriter_pid)
-        # create_collector(postgres.bgwriter_pid)
-        # create_collector(postgres.checkpointer_pid)
+        Attach to the persistent background workers.
+        create_collector(postgres.walwriter_pid)
+        create_collector(postgres.bgwriter_pid)
+        create_collector(postgres.checkpointer_pid)
 
         tscout_bpf["postmaster_events"].open_perf_buffer(
             callback=postmaster_event, lost_cb=lost_something)

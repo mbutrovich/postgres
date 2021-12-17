@@ -73,13 +73,6 @@ class Field:
     canonical_type_kind: clang.cindex.TypeKind
 
 
-@dataclass
-class StructInfo:
-    """Value type of the ClangParser struct_map. Stash any metadata that we need about original parsed structs here."""
-    fields: List[Field]
-    alignment: int
-
-
 class ClangParser:
     """
     On init, ClangParser parses the PostgreSQL source code to construct a
@@ -88,7 +81,7 @@ class ClangParser:
 
     Attributes
     ----------
-    struct_map : Mapping[str, StructInfo]
+    field_map : Mapping[str, List[Field]]
         Maps from (struct name) to a (base-class- and record-type-
         expanded list of all fields for the struct).
     """
@@ -135,14 +128,14 @@ class ClangParser:
         #       but base classes not expanded, record types not expanded.
         # 4. _rtti_map
         #       _fields with base classes expanded.
-        # 5. struct_map
-        #       _fields with base classes expanded and record types expanded, and original struct alignment info.
+        # 5. field_map
+        #       _fields with base classes expanded and record types expanded.
 
         # _classes : list of all classes in the translation unit
         self._classes: List[clang.cindex.Cursor] = classes.values()
         self._classes = sorted(self._classes, key=lambda node: node.spelling)
 
-        # _bases : class name -> list of base classes for the class, for C++ inheritance.
+        # _bases : class name -> list of base classes for the class
         self._bases: Mapping[str, List[clang.cindex.Cursor]] = {
             node.spelling: [
                 child.referenced
@@ -167,7 +160,7 @@ class ClangParser:
         }
 
         # _rtti_map : class name ->
-        #               list of fields in the class with base classes expanded, for C++ inheritance.
+        #               list of fields in the class with base classes expanded
         self._rtti_map: Mapping[str, List[Field]] = {
             node_name: self._construct_base_expanded_fields(node_name)
             for node_name in self._bases
@@ -176,14 +169,12 @@ class ClangParser:
         # field_map: class name ->
         #               list of fields in the class with base classes expanded
         #               and record types expanded
-        self.struct_map: Mapping[str, StructInfo] = {
+        self.field_map: Mapping[str, List[Field]] = {
             node_name:
-                StructInfo(
-                    fields=self._construct_fully_expanded_fields(
-                        node_name,
-                        prefix=f'{node_name}_'
-                    ),
-                    alignment=classes[node_name].type.get_align())
+                self._construct_fully_expanded_fields(
+                    node_name,
+                    prefix=f'{node_name}_'
+                )
             for node_name in self._bases
         }
 

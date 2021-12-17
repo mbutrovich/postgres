@@ -49,7 +49,6 @@
 #include "storage/proc.h"
 #include "storage/smgr.h"
 #include "storage/standby.h"
-#include "tscout/marker.h"
 #include "utils/memdebug.h"
 #include "utils/ps_status.h"
 #include "utils/rel.h"
@@ -2523,8 +2522,6 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	uint32		buf_state;
 	BufferTag	tag;
 
-        TS_MARKER(SyncOneBuffer_begin, 0);
-
 	ReservePrivateRefCountEntry();
 
 	/*
@@ -2545,8 +2542,6 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	}
 	else if (skip_recently_used)
 	{
-                TS_MARKER(SyncOneBuffer_end, 0);
-                TS_MARKER(SyncOneBuffer_features, 0, buf_state, skip_recently_used, wb_context);
 		/* Caller told us not to write recently-used buffers */
 		UnlockBufHdr(bufHdr, buf_state);
 		return result;
@@ -2554,8 +2549,6 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 
 	if (!(buf_state & BM_VALID) || !(buf_state & BM_DIRTY))
 	{
-                TS_MARKER(SyncOneBuffer_end, 0);
-                TS_MARKER(SyncOneBuffer_features, 0, buf_state, skip_recently_used, wb_context);
 		/* It's clean, so nothing to do */
 		UnlockBufHdr(bufHdr, buf_state);
 		return result;
@@ -2577,9 +2570,6 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	UnpinBuffer(bufHdr, true);
 
 	ScheduleBufferTagForWriteback(wb_context, &tag);
-
-        TS_MARKER(SyncOneBuffer_end, 0);
-        TS_MARKER(SyncOneBuffer_features, 0, buf_state, skip_recently_used, wb_context);
 
 	return result | BUF_WRITTEN;
 }

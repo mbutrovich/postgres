@@ -21,8 +21,6 @@ POSTGRES_PATH = r'../..'
 POSTGRES_FILES = (
     f'{POSTGRES_PATH}/src/backend/executor/execMain.c',
     f'{POSTGRES_PATH}/src/backend/postmaster/autovacuum.c',
-    f'{POSTGRES_PATH}/src/backend/storage/buffer/bufmgr.c',
-    f'{POSTGRES_PATH}/src/backend/storage/buffer/freelist.c'
 )
 # The arguments that Clang uses to parse header files.
 CLANG_ARGS = [

@@ -388,7 +388,7 @@ if __name__ == '__main__':
                 raise KeyboardInterrupt
 
 
-        Attach to the persistent background workers.
+        # Attach to the persistent background workers.
         create_collector(postgres.walwriter_pid)
         create_collector(postgres.bgwriter_pid)
         create_collector(postgres.checkpointer_pid)

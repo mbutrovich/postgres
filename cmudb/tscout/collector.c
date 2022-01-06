@@ -8,6 +8,7 @@
 
 struct resource_metrics {
   SUBST_METRICS;
+  u64 start_time;  // If more fields are added, adjust the size of the memcpy in the flush marker.
 };
 
 // Each Collector needs a handle to read perf counters
@@ -25,7 +26,5 @@ BPF_HASH(running_metrics, u64, struct resource_metrics, 32);  // TODO(Matt): Thi
 static u64 ou_key(const u32 ou, const s32 ou_instance) { return ((u64)ou) << 32 | ou_instance; }
 
 static void metrics_accumulate(struct resource_metrics *const lhs, const struct resource_metrics *const rhs) {
-  // never overwrite start_time or cpu_id
-  lhs->end_time = rhs->end_time;  // always overwrite end_time
   SUBST_ACCUMULATE;
 }

@@ -444,13 +444,9 @@ OU_DEFS = [
 # The metrics to be defined for every OU. If you add anything to these metrics, consider if it should be accumulated
 # across invocations and adjust code related to SUBST_ACCUMULATE as needed.
 OU_METRICS = (
-    BPFVariable(name="start_time",
+    BPFVariable(name="cpu_cycles",
                 c_type=clang.cindex.TypeKind.ULONG,
                 alignment=8),
-    BPFVariable(name="end_time",
-                c_type=clang.cindex.TypeKind.ULONG),
-    BPFVariable(name="cpu_cycles",
-                c_type=clang.cindex.TypeKind.ULONG),
     BPFVariable(name="instructions",
                 c_type=clang.cindex.TypeKind.ULONG),
     BPFVariable(name="cache_references",

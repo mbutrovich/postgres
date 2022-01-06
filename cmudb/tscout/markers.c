@@ -67,8 +67,8 @@ void SUBST_OU_end(struct pt_regs *ctx) {
   // this is enough to greatly alter measurements, but if it gets any more complicated...
 
   // Collect an end time before probes are complete, converting from nanoseconds to microseconds.
-  metrics->end_time = (bpf_ktime_get_ns() >> 10);
-  metrics->elapsed_us = (metrics->end_time - metrics->start_time);
+  u64 end_time = (bpf_ktime_get_ns() >> 10);
+  metrics->elapsed_us = (end_time - metrics->start_time);
 
   // Probe for CPU counters
   if (!cpu_end(metrics)) {
@@ -159,8 +159,8 @@ void SUBST_OU_flush(struct pt_regs *ctx) {
   // Copy completed features to output struct
   __builtin_memcpy(&(output->SUBST_FIRST_FEATURE), features, sizeof(struct SUBST_OU_features));
 
-  // Copy completed metrics to output struct
-  __builtin_memcpy(&(output->SUBST_FIRST_METRIC), flush_metrics, sizeof(struct resource_metrics));
+  // Copy completed metrics to output struct. We subtract the sizeof start_time since we don't output that field.
+  __builtin_memcpy(&(output->SUBST_FIRST_METRIC), flush_metrics, sizeof(struct resource_metrics) - sizeof(u64));
 
   output->pid = bpf_get_current_pid_tgid();
 

@@ -8,7 +8,9 @@
 
 struct resource_metrics {
   SUBST_METRICS;
-  u64 start_time;  // If more fields are added, adjust the size of the memcpy in the flush marker.
+  // The fields below are for bookkeeping/BPF-use only, not to be outputted. If more fields are added, adjust the size
+  // of the memcpy in the flush marker.
+  u64 start_time;  // Used to compute elapsed_us.
 };
 
 // Each Collector needs a handle to read perf counters
@@ -18,7 +20,7 @@ BPF_PERF_ARRAY(cache_references, MAX_CPUS);
 BPF_PERF_ARRAY(cache_misses, MAX_CPUS);
 BPF_PERF_ARRAY(ref_cpu_cycles, MAX_CPUS);
 
-// Stores accumulated metrics, waiting to hit a FEATURES Marker
+// Stores accumulated metrics, waiting to hit a FLUSH Marker
 BPF_HASH(complete_metrics, u64, struct resource_metrics, 32);  // TODO(Matt): Think about this size more
 // Stores a snapshot of the metrics at START Marker, waiting to hit an END Marker
 BPF_HASH(running_metrics, u64, struct resource_metrics, 32);  // TODO(Matt): Think about this size more

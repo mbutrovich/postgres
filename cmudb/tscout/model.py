@@ -37,8 +37,11 @@ class BPFType(str, Enum):
 
 @dataclass
 class BPFVariable:
+    # TODO(Matt): Should this extend Field? Their members look very similar now. model doesn't know about clang_parser
+    #  and maybe it should stay that way.
     name: str
     c_type: clang.cindex.TypeKind
+    pg_type: str = None  # Some BPFVariables don't originate from Postgres (e.g., metrics and metadata) so default None
     alignment: int = None  # Non-None for the first field of a struct, using alignment value of the struct.
 
     def alignment_string(self):
@@ -133,13 +136,15 @@ class Feature:
 
 # Internally, Postgres stores query_id as uint64. However, EXPLAIN VERBOSE and pg_stat_statements both represent
 # query_id as BIGINT so TScout stores it as int64 to match this representation.
-QUERY_ID = Feature("QueryId", readarg_p=False, bpf_tuple=(BPFVariable("query_id", clang.cindex.TypeKind.LONG),))
+QUERY_ID = Feature("QueryId", readarg_p=False,
+                   bpf_tuple=(BPFVariable(name="query_id", c_type=clang.cindex.TypeKind.LONG),))
 LEFT_CHILD_NODE_ID = Feature("left_child_plan_node_id", readarg_p=False,
-                             bpf_tuple=(BPFVariable("left_child_plan_node_id", clang.cindex.TypeKind.INT),))
+                             bpf_tuple=(BPFVariable(name="left_child_plan_node_id", c_type=clang.cindex.TypeKind.INT),))
 RIGHT_CHILD_NODE_ID = Feature("right_child_plan_node_id", readarg_p=False,
-                              bpf_tuple=(BPFVariable("right_child_plan_node_id", clang.cindex.TypeKind.INT),))
+                              bpf_tuple=(
+                                  BPFVariable(name="right_child_plan_node_id", c_type=clang.cindex.TypeKind.INT),))
 STATEMENT_TIMESTAMP = Feature("statement_timestamp", readarg_p=False,
-                              bpf_tuple=(BPFVariable("statement_timestamp", clang.cindex.TypeKind.LONG),))
+                              bpf_tuple=(BPFVariable(name="statement_timestamp", c_type=clang.cindex.TypeKind.LONG),))
 
 """
 An OU is specified via (operator, postgres_function, feature_types).
@@ -610,6 +615,7 @@ class Model:
                             BPFVariable(
                                 name=field.name,
                                 c_type=field.canonical_type_kind,
+                                pg_type=field.pg_type,
                                 alignment=field.alignment if i == 0 else None
                             )
                         )

@@ -115,6 +115,46 @@ def generate_readargs(feature_list):
     return ''.join(code)
 
 
+def generate_encoders(feature_list):
+    code = []
+    for feature in feature_list:
+        for i, field in enumerate(feature.bpf_tuple):
+            if field.pg_type == 'List *':
+                encoder = """
+List *test_list_{};
+bpf_probe_read(&test_list_{}, sizeof(List *), &(features->{}));
+s64 test_length_{};
+bpf_probe_read(&test_length_{}, sizeof(s64), &(test_list_{}->length));
+bpf_trace_printk("%d\\n",test_length_{});
+                """.format(i, i, field.name, i, i, i, i)
+                # encoder = ['bpf_trace_printk(\"%d\",(s64)',
+                #            # 'features->',
+                #            # f'{field.name} = ',
+                #            f'(({field.pg_type})',
+                #            f'(features->{field.name}))->length',
+                #            ')',
+                #            ';\n']
+                code.append(encoder)
+    #     if feature.readarg_p:
+    #         readarg_p = ['  bpf_usdt_readarg_p(',
+    #                      f'{idx + non_feature_usdt_args}, ',
+    #                      'ctx, ',
+    #                      f'&(features->{first_member}), ',
+    #                      f'sizeof(struct DECL_{feature.name})',
+    #                      ');\n']
+    #         code.append(''.join(readarg_p))
+    #     else:
+    #         readarg = ['  bpf_usdt_readarg(',
+    #                    f'{idx + non_feature_usdt_args}, ',
+    #                    'ctx, ',
+    #                    f'&(features->{first_member})',
+    #                    ');\n']
+    #         code.append(''.join(readarg))
+    # return ''.join(code)
+    # print(''.join(code))
+    return ''.join(code)
+
+
 def generate_markers(operation, ou_index):
     global helper_struct_defs
     # Load the C code for the Markers.
@@ -126,6 +166,8 @@ def generate_markers(operation, ou_index):
                                   f'{operation.function}')
     markers_c = markers_c.replace("SUBST_READARGS",
                                   generate_readargs(operation.features_list))
+    markers_c = markers_c.replace("SUBST_ENCODERS",
+                                  generate_encoders(operation.features_list))
     markers_c = markers_c.replace("SUBST_FEATURES",
                                   operation.features_struct())
     markers_c = markers_c.replace("SUBST_INDEX",
@@ -168,6 +210,8 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
 
     num_cpus = len(utils.get_online_cpus())
     collector_c = collector_c.replace("MAX_CPUS", str(num_cpus))
+
+    print(collector_c, file=open('./test.c', 'w'))
 
     # Attach USDT probes to the target PID.
     collector_probes = USDT(pid=pid)

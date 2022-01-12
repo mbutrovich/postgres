@@ -30,13 +30,20 @@ static void metrics_accumulate(struct resource_metrics *const lhs, const struct 
   SUBST_ACCUMULATE;
 }
 
-typedef struct List
-{
-  int		type;			/* T_List, T_IntList, or T_OidList */
-  int			length;			/* number of elements currently present */
-  int			max_length;		/* allocated length of elements[] */
-  int   *elements;		/* re-allocatable array of cells */
+typedef struct List {
+  int type;       /* T_List, T_IntList, or T_OidList */
+  int length;     /* number of elements currently present */
+  int max_length; /* allocated length of elements[] */
+  int *elements;  /* re-allocatable array of cells */
   /* We may allocate some cells along with the List header: */
-  int	*initial_elements;
+  int *initial_elements;
   /* If elements == initial_elements, it's not a separate allocation */
 } List;
+
+static s64 encode_List(void *list_ptr) {
+  List *list;
+  bpf_probe_read(&list, sizeof(List *), list_ptr);
+  s32 length;
+  bpf_probe_read(&length, sizeof(s32), &(list->length));
+  return (s64)length;
+};

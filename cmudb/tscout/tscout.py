@@ -121,37 +121,10 @@ def generate_encoders(feature_list):
         for i, field in enumerate(feature.bpf_tuple):
             if field.pg_type == 'List *':
                 encoder = """
-List *test_list_{};
-bpf_probe_read(&test_list_{}, sizeof(List *), &(features->{}));
-s64 test_length_{};
-bpf_probe_read(&test_length_{}, sizeof(s64), &(test_list_{}->length));
+s64 test_length_{} = encode_List(&(features->{}));
 bpf_trace_printk("%d\\n",test_length_{});
-                """.format(i, i, field.name, i, i, i, i)
-                # encoder = ['bpf_trace_printk(\"%d\",(s64)',
-                #            # 'features->',
-                #            # f'{field.name} = ',
-                #            f'(({field.pg_type})',
-                #            f'(features->{field.name}))->length',
-                #            ')',
-                #            ';\n']
+                """.format(i, field.name, i)
                 code.append(encoder)
-    #     if feature.readarg_p:
-    #         readarg_p = ['  bpf_usdt_readarg_p(',
-    #                      f'{idx + non_feature_usdt_args}, ',
-    #                      'ctx, ',
-    #                      f'&(features->{first_member}), ',
-    #                      f'sizeof(struct DECL_{feature.name})',
-    #                      ');\n']
-    #         code.append(''.join(readarg_p))
-    #     else:
-    #         readarg = ['  bpf_usdt_readarg(',
-    #                    f'{idx + non_feature_usdt_args}, ',
-    #                    'ctx, ',
-    #                    f'&(features->{first_member})',
-    #                    ');\n']
-    #         code.append(''.join(readarg))
-    # return ''.join(code)
-    # print(''.join(code))
     return ''.join(code)
 
 

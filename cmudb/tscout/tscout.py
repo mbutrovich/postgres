@@ -157,6 +157,10 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     # Read the C code for the Collector.
     with open('collector.c', 'r') as collector_file:
         collector_c = collector_file.read()
+
+    for encoder in model.ENCODERS.values():
+        collector_c += encoder.encoder_fn()
+
     # Append the C code for the Probes.
     with open('probes.c', 'r') as probes_file:
         collector_c += probes_file.read()

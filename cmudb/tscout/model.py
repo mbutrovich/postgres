@@ -138,22 +138,37 @@ class Feature:
 class Encoder:
     type_name: str
     return_type: clang.cindex.TypeKind  # Must be an 8-byte type since it was originally a pointer.
-    c_encoder: str
+    c_encoder: str  # BPF C code with final encoded value in a stack variable named encoded. Please indent 2 spaces.
+
+    def encoder_name(self):
+        return f'encode_{self.type_name}'
 
     def encode_one_field(self, field_name):
         var_name = f'encoded_{field_name}'
         one_field = [f'{CLANG_TO_BPF[self.return_type]} ',
                      f'{var_name} = ',
-                     f'encode_{self.type_name}',
+                     self.encoder_name(),
                      f'(&(features->{field_name}));\n',
-                     f'bpf_trace_printk("%d\\n",{var_name});',
-                     ';\n']
+                     f'bpf_trace_printk("%d\\n",{var_name});\n']
         return ''.join(one_field)
+
+    def encoder_fn(self):
+        encoder = [f'static {CLANG_TO_BPF[self.return_type]} ',
+                   self.encoder_name(),
+                   '(void *raw_ptr) {\n',
+                   f'  {self.type_name} *cast_ptr;\n',
+                   f'  bpf_probe_read(&cast_ptr, sizeof({self.type_name} *), raw_ptr);',
+                   self.c_encoder,
+                   f'  return ({CLANG_TO_BPF[self.return_type]})encoded;\n',
+                   '}\n\n']
+        return ''.join(encoder)
 
 
 ENCODERS = {
     'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
-    """)
+  s32 encoded;
+  bpf_probe_read(&encoded, sizeof(s32), &(cast_ptr->length));
+""")
 }
 
 # Internally, Postgres stores query_id as uint64. However, EXPLAIN VERBOSE and pg_stat_statements both represent

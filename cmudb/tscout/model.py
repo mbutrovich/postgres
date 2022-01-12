@@ -134,6 +134,28 @@ class Feature:
     bpf_tuple: Tuple[BPFVariable] = None
 
 
+@dataclass
+class Encoder:
+    type_name: str
+    return_type: clang.cindex.TypeKind  # Must be an 8-byte type since it was originally a pointer.
+    c_encoder: str
+
+    def encode_one_field(self, field_name):
+        var_name = f'encoded_{field_name}'
+        one_field = [f'{CLANG_TO_BPF[self.return_type]} ',
+                     f'{var_name} = ',
+                     f'encode_{self.type_name}',
+                     f'(&(features->{field_name}));\n',
+                     f'bpf_trace_printk("%d\\n",{var_name});',
+                     ';\n']
+        return ''.join(one_field)
+
+
+ENCODERS = {
+    'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
+    """)
+}
+
 # Internally, Postgres stores query_id as uint64. However, EXPLAIN VERBOSE and pg_stat_statements both represent
 # query_id as BIGINT so TScout stores it as int64 to match this representation.
 QUERY_ID = Feature("QueryId", readarg_p=False,

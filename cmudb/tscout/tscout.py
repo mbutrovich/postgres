@@ -118,13 +118,9 @@ def generate_readargs(feature_list):
 def generate_encoders(feature_list):
     code = []
     for feature in feature_list:
-        for i, field in enumerate(feature.bpf_tuple):
-            if field.pg_type == 'List *':
-                encoder = """
-s64 test_length_{} = encode_List(&(features->{}));
-bpf_trace_printk("%d\\n",test_length_{});
-                """.format(i, field.name, i)
-                code.append(encoder)
+        for field in feature.bpf_tuple:
+            if field.pg_type in model.ENCODERS:
+                code.append(model.ENCODERS[field.pg_type].encode_one_field(field.name))
     return ''.join(code)
 
 

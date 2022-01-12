@@ -159,6 +159,7 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
         collector_c = collector_file.read()
 
     for encoder in model.ENCODERS.values():
+        collector_c += model.struct_decl_for_fields(encoder.type_name, encoder.bpf_tuple)
         collector_c += encoder.encoder_fn()
 
     # Append the C code for the Probes.

@@ -29,13 +29,3 @@ static void metrics_accumulate(struct resource_metrics *const lhs, const struct 
   lhs->end_time = rhs->end_time;  // always overwrite end_time
   SUBST_ACCUMULATE;
 }
-
-typedef struct List {
-  int type;       /* T_List, T_IntList, or T_OidList */
-  int length;     /* number of elements currently present */
-  int max_length; /* allocated length of elements[] */
-  int *elements;  /* re-allocatable array of cells */
-  /* We may allocate some cells along with the List header: */
-  int *initial_elements;
-  /* If elements == initial_elements, it's not a separate allocation */
-} List;

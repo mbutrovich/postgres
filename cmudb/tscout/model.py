@@ -139,6 +139,7 @@ class Encoder:
     type_name: str
     return_type: clang.cindex.TypeKind  # Must be an 8-byte type since it was originally a pointer.
     c_encoder: str  # BPF C code with final encoded value in a stack variable named encoded. Please indent 2 spaces.
+    bpf_tuple: Tuple[BPFVariable] = None
 
     def encoder_name(self):
         return f'encode_{self.type_name}'
@@ -156,8 +157,8 @@ class Encoder:
         encoder = [f'static {CLANG_TO_BPF[self.return_type]} ',
                    self.encoder_name(),
                    '(void *raw_ptr) {\n',
-                   f'  {self.type_name} *cast_ptr;\n',
-                   f'  bpf_probe_read(&cast_ptr, sizeof({self.type_name} *), raw_ptr);',
+                   f'  struct DECL_{self.type_name} *cast_ptr;\n',
+                   f'  bpf_probe_read(&cast_ptr, sizeof(struct DECL_{self.type_name} *), raw_ptr);',
                    self.c_encoder,
                    f'  return ({CLANG_TO_BPF[self.return_type]})encoded;\n',
                    '}\n\n']
@@ -167,7 +168,7 @@ class Encoder:
 ENCODERS = {
     'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
   s32 encoded;
-  bpf_probe_read(&encoded, sizeof(s32), &(cast_ptr->length));
+  bpf_probe_read(&encoded, sizeof(s32), &(cast_ptr->List_length));
 """)
 }
 
@@ -522,6 +523,14 @@ OU_METRICS = (
 )
 
 
+def struct_decl_for_fields(name, bpf_tuple):
+    decl = [f'struct DECL_{name}', '{']
+    for column in bpf_tuple:
+        decl.append(f'{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};')
+    decl.append('};\n')
+    return '\n'.join(decl)
+
+
 @dataclass
 class OperatingUnit:
     """
@@ -617,11 +626,8 @@ class OperatingUnit:
         decls = {}
         for feature in self.features_list:
             if feature.readarg_p:
-                decl = [f'struct DECL_{feature.name}', '{']
-                for column in feature.bpf_tuple:
-                    decl.append(f'{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};')
-                decl.append('};')
-                decls[feature.name] = '\n'.join(decl)
+                decl = struct_decl_for_fields(feature.name, feature.bpf_tuple)
+                decls[feature.name] = decl
         return decls
 
 
@@ -635,6 +641,27 @@ class Model:
     def __init__(self):
         nodes = clang_parser.ClangParser()
         operating_units = []
+
+        def extract_bpf_fields(name):
+            bpf_fields: List[BPFVariable] = []
+            for i, field in enumerate(nodes.field_map[name]):
+                try:
+                    bpf_fields.append(
+                        BPFVariable(
+                            name=field.name,
+                            c_type=field.canonical_type_kind,
+                            pg_type=field.pg_type,
+                            alignment=field.alignment if i == 0 else None
+                        )
+                    )
+                except KeyError as e:
+                    logger.critical(
+                        'No mapping from Clang to BPF for type {} for field {} in the struct {}.'.format(e,
+                                                                                                         field.name,
+                                                                                                         feature.name))
+                    exit()
+            return bpf_fields
+
         for postgres_function, features in OU_DEFS:
             feature_list = []
             for feature in features:
@@ -645,23 +672,7 @@ class Model:
                     feature_list.append(feature)
                     continue
                 # Otherwise, convert the list of fields to BPF types.
-                bpf_fields: List[BPFVariable] = []
-                for i, field in enumerate(nodes.field_map[feature.name]):
-                    try:
-                        bpf_fields.append(
-                            BPFVariable(
-                                name=field.name,
-                                c_type=field.canonical_type_kind,
-                                pg_type=field.pg_type,
-                                alignment=field.alignment if i == 0 else None
-                            )
-                        )
-                    except KeyError as e:
-                        logger.critical(
-                            'No mapping from Clang to BPF for type {} for field {} in the struct {}.'.format(e,
-                                                                                                             field.name,
-                                                                                                             feature.name))
-                        exit()
+                bpf_fields = extract_bpf_fields(feature.name)
                 new_feature = Feature(feature.name,
                                       bpf_tuple=bpf_fields,
                                       readarg_p=True)
@@ -669,6 +680,10 @@ class Model:
 
             new_ou = OperatingUnit(postgres_function, feature_list)
             operating_units.append(new_ou)
+
+        for encoder in ENCODERS.values():
+            bpf_fields = extract_bpf_fields(encoder.type_name)
+            encoder.bpf_tuple = bpf_fields
 
         self.operating_units = operating_units
         self.metrics = OU_METRICS

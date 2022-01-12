@@ -106,6 +106,8 @@ CLANG_TO_BPF = {
     clang.cindex.TypeKind.INT: BPFType.i32,
     clang.cindex.TypeKind.LONG: BPFType.i64,
     clang.cindex.TypeKind.LONGLONG: BPFType.i64,
+    # We memcpy floats and doubles into unsigned integer types of the same size because BPF doesn't support floating
+    # point types. We later read this memory back as the original floating point type in user-space.
     clang.cindex.TypeKind.FLOAT: BPFType.u32,
     clang.cindex.TypeKind.DOUBLE: BPFType.u64,
     clang.cindex.TypeKind.ENUM: BPFType.i32,

@@ -150,7 +150,8 @@ class Encoder:
                      f'{var_name} = ',
                      self.encoder_name(),
                      f'(&(features->{field_name}));\n',
-                     f'bpf_trace_printk("%d\\n",{var_name});\n']
+                     f'features->{field_name} = ',
+                     f'{var_name};\n']
         return ''.join(one_field)
 
     def encoder_fn(self):

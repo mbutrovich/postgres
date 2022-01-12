@@ -649,7 +649,8 @@ class Model:
                     bpf_fields.append(
                         BPFVariable(
                             name=field.name,
-                            c_type=field.canonical_type_kind,
+                            c_type=field.canonical_type_kind if field.pg_type not in ENCODERS else
+                            ENCODERS[field.pg_type].return_type,
                             pg_type=field.pg_type,
                             alignment=field.alignment if i == 0 else None
                         )

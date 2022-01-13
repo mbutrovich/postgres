@@ -18,6 +18,8 @@ import clang_parser
 
 logger = logging.getLogger('tscout')
 
+FLOAT_DOUBLE_NDIGITS = 3
+
 
 @unique
 class BPFType(str, Enum):
@@ -75,9 +77,13 @@ class BPFVariable:
             The serialized value of this variable.
         """
         if self.c_type == clang.cindex.TypeKind.FLOAT:
-            return str(struct.unpack('f', getattr(output_event, self.name).to_bytes(4, byteorder=sys.byteorder))[0])
+            float_val = struct.unpack('f', getattr(output_event, self.name).to_bytes(4, byteorder=sys.byteorder))[0]
+            float_val = round(float_val, FLOAT_DOUBLE_NDIGITS)
+            return str(float_val)
         elif self.c_type == clang.cindex.TypeKind.DOUBLE:
-            return str(struct.unpack('d', getattr(output_event, self.name).to_bytes(8, byteorder=sys.byteorder))[0])
+            double_val = struct.unpack('d', getattr(output_event, self.name).to_bytes(8, byteorder=sys.byteorder))[0]
+            double_val = round(double_val, FLOAT_DOUBLE_NDIGITS)
+            return str(double_val)
         else:
             return str(getattr(output_event, self.name))
 
@@ -125,11 +131,15 @@ class Feature:
     bpf_tuple: Tuple[BPFVariable] = None
 
 
-QUERY_ID = Feature("QueryId", readarg_p=False, bpf_tuple=(BPFVariable("query_id", clang.cindex.TypeKind.ULONG),))
+# Internally, Postgres stores query_id as uint64. However, EXPLAIN VERBOSE and pg_stat_statements both represent
+# query_id as BIGINT so TScout stores it as int64 to match this representation.
+QUERY_ID = Feature("QueryId", readarg_p=False, bpf_tuple=(BPFVariable("query_id", clang.cindex.TypeKind.LONG),))
 LEFT_CHILD_NODE_ID = Feature("left_child_plan_node_id", readarg_p=False,
                              bpf_tuple=(BPFVariable("left_child_plan_node_id", clang.cindex.TypeKind.INT),))
 RIGHT_CHILD_NODE_ID = Feature("right_child_plan_node_id", readarg_p=False,
                               bpf_tuple=(BPFVariable("right_child_plan_node_id", clang.cindex.TypeKind.INT),))
+STATEMENT_TIMESTAMP = Feature("statement_timestamp", readarg_p=False,
+                              bpf_tuple=(BPFVariable("statement_timestamp", clang.cindex.TypeKind.LONG),))
 
 """
 An OU is specified via (operator, postgres_function, feature_types).
@@ -148,252 +158,288 @@ OU_DEFS = [
          QUERY_ID,
          Feature("Agg"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecAppend",
      [
          QUERY_ID,
          Feature("Append"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecCteScan",
      [
          QUERY_ID,
          Feature("CteScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecCustomScan",
      [
          QUERY_ID,
          Feature("CustomScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecForeignScan",
      [
          QUERY_ID,
          Feature("ForeignScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecFunctionScan",
      [
          QUERY_ID,
          Feature("FunctionScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecGather",
      [
          QUERY_ID,
          Feature("Gather"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecGatherMerge",
      [
          QUERY_ID,
          Feature("GatherMerge"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecGroup",
      [
          QUERY_ID,
          Feature("Group"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecHashJoinImpl",
      [
          QUERY_ID,
          Feature("HashJoin"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecIncrementalSort",
      [
          QUERY_ID,
          Feature("IncrementalSort"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecIndexOnlyScan",
      [
          QUERY_ID,
          Feature("IndexOnlyScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecIndexScan",
      [
          QUERY_ID,
          Feature("IndexScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecLimit",
      [
          QUERY_ID,
          Feature("Limit"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecLockRows",
      [
          QUERY_ID,
          Feature("LockRows"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecMaterial",
      [
          QUERY_ID,
          Feature("Material"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecMergeAppend",
      [
          QUERY_ID,
          Feature("MergeAppend"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecMergeJoin",
      [
          QUERY_ID,
          Feature("MergeJoin"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecModifyTable",
      [
          QUERY_ID,
          Feature("ModifyTable"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecNamedTuplestoreScan",
      [
          QUERY_ID,
          Feature("NamedTuplestoreScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecNestLoop",
      [
          QUERY_ID,
          Feature("NestLoop"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecProjectSet",
      [
          QUERY_ID,
          Feature("ProjectSet"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecRecursiveUnion",
      [
          QUERY_ID,
          Feature("RecursiveUnion"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecResult",
      [
          QUERY_ID,
          Feature("Result"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSampleScan",
      [
          QUERY_ID,
          Feature("SampleScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSeqScan",
      [
          QUERY_ID,
          Feature("Scan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSetOp",
      [
          QUERY_ID,
          Feature("SetOp"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSort",
      [
          QUERY_ID,
          Feature("Sort"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSubPlan",
      [
          QUERY_ID,
          Feature("Plan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecSubqueryScan",
      [
          QUERY_ID,
          Feature("SubqueryScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecTableFuncScan",
      [
          QUERY_ID,
          Feature("TableFuncScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecTidScan",
      [
          QUERY_ID,
          Feature("TidScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecUnique",
      [
          QUERY_ID,
          Feature("Unique"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecValuesScan",
      [
          QUERY_ID,
          Feature("ValuesScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecWindowAgg",
      [
          QUERY_ID,
          Feature("WindowAgg"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecWorkTableScan",
      [
          QUERY_ID,
          Feature("WorkTableScan"),
          LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
      ]),
     ("do_autovacuum",
      [
@@ -411,7 +457,8 @@ OU_DEFS = [
      ]),
 ]
 
-# The metrics to be defined for every OU.
+# The metrics to be defined for every OU. If you add anything to these metrics, consider if it should be accumulated
+# across invocations and adjust code related to SUBST_ACCUMULATE as needed.
 OU_METRICS = (
     BPFVariable(name="start_time",
                 c_type=clang.cindex.TypeKind.ULONG,

@@ -215,6 +215,14 @@ OU_DEFS = [
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
      ]),
+    ("ExecBitmapAnd",
+     [
+         QUERY_ID,
+         Feature("BitmapAnd"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
     ("ExecCteScan",
      [
          QUERY_ID,
@@ -267,6 +275,14 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Group"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
+    ("ExecHash",
+     [
+         QUERY_ID,
+         Feature("Hash"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP

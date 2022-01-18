@@ -9,7 +9,7 @@ import logging
 import struct
 import sys
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import Enum, unique, auto
 from typing import List, Mapping, Tuple
 
 import clang.cindex
@@ -141,6 +141,13 @@ RIGHT_CHILD_NODE_ID = Feature("right_child_plan_node_id", readarg_p=False,
 STATEMENT_TIMESTAMP = Feature("statement_timestamp", readarg_p=False,
                               bpf_tuple=(BPFVariable("statement_timestamp", clang.cindex.TypeKind.LONG),))
 
+
+@unique
+class WorkerType(Enum):
+    BACKEND = 0,
+    BACKGROUND = 1
+
+
 """
 An OU is specified via (operator, postgres_function, feature_types).
 
@@ -160,7 +167,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecAppend",
      [
          QUERY_ID,
@@ -168,7 +176,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecBitmapAnd",
      [
          QUERY_ID,
@@ -176,7 +185,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecCteScan",
      [
          QUERY_ID,
@@ -184,7 +194,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecCustomScan",
      [
          QUERY_ID,
@@ -192,7 +203,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecForeignScan",
      [
          QUERY_ID,
@@ -200,7 +212,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecFunctionScan",
      [
          QUERY_ID,
@@ -208,7 +221,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecGather",
      [
          QUERY_ID,
@@ -216,7 +230,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecGatherMerge",
      [
          QUERY_ID,
@@ -224,7 +239,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecGroup",
      [
          QUERY_ID,
@@ -232,7 +248,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecHash",
      [
          QUERY_ID,
@@ -240,7 +257,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecHashJoinImpl",
      [
          QUERY_ID,
@@ -248,7 +266,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecIncrementalSort",
      [
          QUERY_ID,
@@ -256,7 +275,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecIndexOnlyScan",
      [
          QUERY_ID,
@@ -264,7 +284,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecIndexScan",
      [
          QUERY_ID,
@@ -272,7 +293,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecLimit",
      [
          QUERY_ID,
@@ -280,7 +302,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecLockRows",
      [
          QUERY_ID,
@@ -288,7 +311,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecMaterial",
      [
          QUERY_ID,
@@ -296,7 +320,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecMergeAppend",
      [
          QUERY_ID,
@@ -304,7 +329,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecMergeJoin",
      [
          QUERY_ID,
@@ -312,7 +338,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecModifyTable",
      [
          QUERY_ID,
@@ -320,7 +347,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecNamedTuplestoreScan",
      [
          QUERY_ID,
@@ -328,7 +356,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecNestLoop",
      [
          QUERY_ID,
@@ -336,7 +365,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecProjectSet",
      [
          QUERY_ID,
@@ -344,7 +374,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecRecursiveUnion",
      [
          QUERY_ID,
@@ -352,7 +383,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecResult",
      [
          QUERY_ID,
@@ -360,7 +392,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSampleScan",
      [
          QUERY_ID,
@@ -368,7 +401,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSeqScan",
      [
          QUERY_ID,
@@ -376,7 +410,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSetOp",
      [
          QUERY_ID,
@@ -384,7 +419,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSort",
      [
          QUERY_ID,
@@ -392,7 +428,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSubPlan",
      [
          QUERY_ID,
@@ -400,7 +437,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecSubqueryScan",
      [
          QUERY_ID,
@@ -408,7 +446,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecTableFuncScan",
      [
          QUERY_ID,
@@ -416,7 +455,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecTidScan",
      [
          QUERY_ID,
@@ -424,7 +464,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecUnique",
      [
          QUERY_ID,
@@ -432,7 +473,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecValuesScan",
      [
          QUERY_ID,
@@ -440,7 +482,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecWindowAgg",
      [
          QUERY_ID,
@@ -448,7 +491,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("ExecWorkTableScan",
      [
          QUERY_ID,
@@ -456,7 +500,8 @@ OU_DEFS = [
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
-     ]),
+     ],
+     (WorkerType.BACKEND,)),
     ("do_autovacuum",
      [
          Feature("PgStat_StatTabEntry"),
@@ -470,7 +515,8 @@ OU_DEFS = [
                  bpf_tuple=(BPFVariable("doanalyze", clang.cindex.TypeKind.BOOL),)),
          Feature("wraparound", readarg_p=False,
                  bpf_tuple=(BPFVariable("wraparound", clang.cindex.TypeKind.BOOL),)),
-     ]),
+     ],
+     (WorkerType.BACKGROUND,)),
 ]
 
 # The metrics to be defined for every OU. If you add anything to these metrics, consider if it should be accumulated
@@ -524,6 +570,7 @@ class OperatingUnit:
     """
     function: str
     features_list: List[Feature]
+    worker_types: List[WorkerType]
 
     def name(self) -> str:
         return self.function
@@ -623,7 +670,7 @@ class Model:
     def __init__(self):
         nodes = clang_parser.ClangParser()
         operating_units = []
-        for postgres_function, features in OU_DEFS:
+        for postgres_function, features, worker_types in OU_DEFS:
             feature_list = []
             for feature in features:
                 # If an explicit list of BPF fields were specified,
@@ -654,7 +701,7 @@ class Model:
                                       readarg_p=True)
                 feature_list.append(new_feature)
 
-            new_ou = OperatingUnit(postgres_function, feature_list)
+            new_ou = OperatingUnit(postgres_function, feature_list, worker_types)
             operating_units.append(new_ou)
 
         self.operating_units = operating_units

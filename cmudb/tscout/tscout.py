@@ -139,7 +139,7 @@ def generate_markers(operation, ou_index):
     return markers_c
 
 
-def collector(collector_flags, ou_processor_queues, pid, socket_fd):
+def collector(collector_flags, ou_processor_queues, pid, worker_type, socket_fd):
     global helper_struct_defs
     setproctitle.setproctitle("{} TScout Collector".format(pid))
 
@@ -150,8 +150,11 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     with open('probes.c', 'r') as probes_file:
         collector_c += probes_file.read()
     # Append the C code for the Markers.
+    ou_indexes = []
     for ou_index, ou in enumerate(operating_units):
-        collector_c += generate_markers(ou, ou_index)
+        if worker_type in ou.worker_types:
+            collector_c += generate_markers(ou, ou_index)
+            ou_indexes.append(ou_index)
     # Prepend the helper struct defs.
     collector_c = '\n'.join(helper_struct_defs.values()) + '\n' + collector_c
 
@@ -172,8 +175,9 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     # Attach USDT probes to the target PID.
     collector_probes = USDT(pid=pid)
     for ou in operating_units:
-        for probe in [ou.features_marker(), ou.begin_marker(), ou.end_marker(), ou.flush_marker()]:
-            collector_probes.enable_probe(probe=probe, fn_name=probe)
+        if worker_type in ou.worker_types:
+            for probe in [ou.features_marker(), ou.begin_marker(), ou.end_marker(), ou.flush_marker()]:
+                collector_probes.enable_probe(probe=probe, fn_name=probe)
 
     # Load the BPF program, eliding setting the socket fd
     # if this pid won't generate network metrics.
@@ -237,8 +241,9 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
 
         return collector_event
 
-    # Open an output buffer for this OU.
-    for i in range(len(operating_units)):
+    # Open an output buffer for this OU. ou_indexes was generated from a filter on worker_type, so it should only
+    # contain indexes that are valid for this worker.
+    for i in ou_indexes:
         output_buffer = f'collector_results_{i}'
         collector_bpf[output_buffer].open_perf_buffer(
             callback=collector_event_builder(output_buffer),
@@ -355,7 +360,7 @@ if __name__ == "__main__":
             ou_processors.append(ou_processor)
 
 
-        def create_collector(child_pid, socket_fd=None):
+        def create_collector(child_pid, worker_type, socket_fd=None):
             logger.info(f"Postmaster forked PID {child_pid}, "
                         f"creating its Collector.")
             collector_flags[child_pid] = True
@@ -364,6 +369,7 @@ if __name__ == "__main__":
                 args=(collector_flags,
                       ou_processor_queues,
                       child_pid,
+                      worker_type,
                       socket_fd))
             collector_process.start()
             collector_processes[child_pid] = collector_process
@@ -384,7 +390,7 @@ if __name__ == "__main__":
             child_pid = output_event.pid_
             if event_type == 0 or event_type == 1:
                 fd = output_event.socket_fd_ if event_type == 0 else None
-                create_collector(child_pid, fd)
+                create_collector(child_pid, model.WorkerType(event_type), fd)
             elif event_type == 2 or event_type == 3:
                 collector_process = collector_processes.get(child_pid)
                 if collector_process:
@@ -395,9 +401,9 @@ if __name__ == "__main__":
 
 
         # Attach to the persistent background workers.
-        create_collector(postgres.walwriter_pid)
-        create_collector(postgres.bgwriter_pid)
-        create_collector(postgres.checkpointer_pid)
+        create_collector(postgres.walwriter_pid, model.WorkerType.BACKGROUND)
+        create_collector(postgres.bgwriter_pid, model.WorkerType.BACKGROUND)
+        create_collector(postgres.checkpointer_pid, model.WorkerType.BACKGROUND)
 
         tscout_bpf["postmaster_events"].open_perf_buffer(
             callback=postmaster_event, lost_cb=lost_something)

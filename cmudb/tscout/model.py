@@ -170,7 +170,7 @@ class Encoder:
 
 ENCODERS = {
     'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
-  s32 encoded;
+  s32 encoded = 0;
   bpf_probe_read(&encoded, sizeof(s32), &(cast_ptr->List_length));
 """)
 }

@@ -9,7 +9,7 @@ import logging
 import struct
 import sys
 from dataclasses import dataclass
-from enum import Enum, unique, auto
+from enum import Enum, unique, IntEnum
 from typing import List, Mapping, Tuple
 
 import clang.cindex
@@ -143,7 +143,7 @@ STATEMENT_TIMESTAMP = Feature("statement_timestamp", readarg_p=False,
 
 
 @unique
-class WorkerType(Enum):
+class WorkerType(IntEnum):
     BACKEND = 0,
     BACKGROUND = 1
 
@@ -541,16 +541,6 @@ OU_DEFS = [
     ("do_autovacuum",
      [
          Feature("PgStat_StatTabEntry"),
-         Feature("effective_multixact_freeze_max_age", readarg_p=False, bpf_tuple=(
-             BPFVariable("effective_multixact_freeze_max_age", clang.cindex.TypeKind.UINT),)),
-         Feature("relnatts", readarg_p=False,
-                 bpf_tuple=(BPFVariable("relnatts", clang.cindex.TypeKind.SHORT),)),
-         Feature("dovacuum", readarg_p=False,
-                 bpf_tuple=(BPFVariable("dovacuum", clang.cindex.TypeKind.BOOL),)),
-         Feature("doanalyze", readarg_p=False,
-                 bpf_tuple=(BPFVariable("doanalyze", clang.cindex.TypeKind.BOOL),)),
-         Feature("wraparound", readarg_p=False,
-                 bpf_tuple=(BPFVariable("wraparound", clang.cindex.TypeKind.BOOL),)),
      ],
      (WorkerType.BACKGROUND,)),
 ]

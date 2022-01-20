@@ -2124,13 +2124,8 @@ do_autovacuum(void)
 								  &dovacuum, &doanalyze, &wraparound);
 
 		/* Relations that need work are added to table_oids */
-		if (dovacuum || doanalyze) {
-                        TS_MARKER(do_autovacuum_features, relid, tabentry,
-                            effective_multixact_freeze_max_age,
-                            classForm->relnatts, dovacuum, doanalyze,
-                            wraparound);
+		if (dovacuum || doanalyze)
 			table_oids = lappend_oid(table_oids, relid);
-                }
 
 		/*
 		 * Remember TOAST associations for the second pass.  Note: we must do
@@ -2212,13 +2207,8 @@ do_autovacuum(void)
 								  &dovacuum, &doanalyze, &wraparound);
 
 		/* ignore analyze for toast tables */
-		if (dovacuum) {
-                  TS_MARKER(do_autovacuum_features, relid, tabentry,
-                            effective_multixact_freeze_max_age,
-                            classForm->relnatts, dovacuum, doanalyze,
-                            wraparound);
+		if (dovacuum)
 			table_oids = lappend_oid(table_oids, relid);
-                }
 	}
 
 	table_endscan(relScan);
@@ -3028,6 +3018,7 @@ recheck_relation_needs_vacanalyze(Oid relid,
 							  effective_multixact_freeze_max_age,
 							  dovacuum, doanalyze, wraparound);
 
+        TS_MARKER(do_autovacuum_features, relid, tabentry);
 	/* ignore ANALYZE for toast tables */
 	if (classForm->relkind == RELKIND_TOASTVALUE)
 		*doanalyze = false;

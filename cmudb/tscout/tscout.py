@@ -185,6 +185,8 @@ def collector(collector_flags, ou_processor_queues, pid, worker_type, socket_fd)
     if socket_fd:
         cflags.append('-DCLIENT_SOCKET_FD={}'.format(socket_fd))
 
+    # print(collector_c, file=open('./test.c', 'w'))
+
     collector_bpf = BPF(text=collector_c,
                         usdt_contexts=[collector_probes],
                         cflags=cflags)
@@ -400,10 +402,10 @@ if __name__ == "__main__":
                 raise KeyboardInterrupt
 
 
-        # Attach to the persistent background workers.
-        create_collector(postgres.walwriter_pid, model.WorkerType.BACKGROUND)
-        create_collector(postgres.bgwriter_pid, model.WorkerType.BACKGROUND)
-        create_collector(postgres.checkpointer_pid, model.WorkerType.BACKGROUND)
+        # TODO(Matt): Attach to the persistent background workers.
+        # create_collector(postgres.walwriter_pid, model.WorkerType.BACKGROUND)
+        # create_collector(postgres.bgwriter_pid, model.WorkerType.BACKGROUND)
+        # create_collector(postgres.checkpointer_pid, model.WorkerType.BACKGROUND)
 
         tscout_bpf["postmaster_events"].open_perf_buffer(
             callback=postmaster_event, lost_cb=lost_something)

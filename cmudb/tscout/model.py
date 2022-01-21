@@ -223,6 +223,30 @@ OU_DEFS = [
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
      ]),
+    ("ExecBitmapHeapScan",
+     [
+         QUERY_ID,
+         Feature("BitmapHeapScan"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
+    ("ExecBitmapIndexScan",
+     [
+         QUERY_ID,
+         Feature("BitmapIndexScan"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
+    ("ExecBitmapOr",
+     [
+         QUERY_ID,
+         Feature("BitmapOr"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
     ("ExecCteScan",
      [
          QUERY_ID,
@@ -339,6 +363,14 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Material"),
+         LEFT_CHILD_NODE_ID,
+         RIGHT_CHILD_NODE_ID,
+         STATEMENT_TIMESTAMP
+     ]),
+    ("ExecMemoize",
+     [
+         QUERY_ID,
+         Feature("Memoize"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP

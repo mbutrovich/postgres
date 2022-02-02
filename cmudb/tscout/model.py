@@ -537,7 +537,7 @@ OU_DEFS = [
     #      RIGHT_CHILD_NODE_ID,
     #      STATEMENT_TIMESTAMP
     #  ],
-     (WorkerType.BACKEND,)),
+    #  (WorkerType.BACKEND,)),
     ("do_autovacuum",
      [
          Feature("PgStat_StatTabEntry"),

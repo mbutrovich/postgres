@@ -160,383 +160,383 @@ feature_types : List[Feature]
     If you modify this list, you must change the markers in PostgreSQL source.
 """
 OU_DEFS = [
-    ("ExecAgg",
-     [
-         QUERY_ID,
-         Feature("Agg"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecAppend",
-     [
-         QUERY_ID,
-         Feature("Append"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecBitmapAnd",
-     [
-         QUERY_ID,
-         Feature("BitmapAnd"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecBitmapHeapScan",
-     [
-         QUERY_ID,
-         Feature("BitmapHeapScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecBitmapIndexScan",
-     [
-         QUERY_ID,
-         Feature("BitmapIndexScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecBitmapOr",
-     [
-         QUERY_ID,
-         Feature("BitmapOr"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecCteScan",
-     [
-         QUERY_ID,
-         Feature("CteScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecCustomScan",
-     [
-         QUERY_ID,
-         Feature("CustomScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecForeignScan",
-     [
-         QUERY_ID,
-         Feature("ForeignScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecFunctionScan",
-     [
-         QUERY_ID,
-         Feature("FunctionScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecGather",
-     [
-         QUERY_ID,
-         Feature("Gather"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecGatherMerge",
-     [
-         QUERY_ID,
-         Feature("GatherMerge"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecGroup",
-     [
-         QUERY_ID,
-         Feature("Group"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecHash",
-     [
-         QUERY_ID,
-         Feature("Hash"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecHashJoinImpl",
-     [
-         QUERY_ID,
-         Feature("HashJoin"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecIncrementalSort",
-     [
-         QUERY_ID,
-         Feature("IncrementalSort"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecIndexOnlyScan",
-     [
-         QUERY_ID,
-         Feature("IndexOnlyScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecIndexScan",
-     [
-         QUERY_ID,
-         Feature("IndexScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecLimit",
-     [
-         QUERY_ID,
-         Feature("Limit"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecLockRows",
-     [
-         QUERY_ID,
-         Feature("LockRows"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecMaterial",
-     [
-         QUERY_ID,
-         Feature("Material"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecMemoize",
-     [
-         QUERY_ID,
-         Feature("Memoize"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecMergeAppend",
-     [
-         QUERY_ID,
-         Feature("MergeAppend"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecMergeJoin",
-     [
-         QUERY_ID,
-         Feature("MergeJoin"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecModifyTable",
-     [
-         QUERY_ID,
-         Feature("ModifyTable"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecNamedTuplestoreScan",
-     [
-         QUERY_ID,
-         Feature("NamedTuplestoreScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecNestLoop",
-     [
-         QUERY_ID,
-         Feature("NestLoop"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecProjectSet",
-     [
-         QUERY_ID,
-         Feature("ProjectSet"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecRecursiveUnion",
-     [
-         QUERY_ID,
-         Feature("RecursiveUnion"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecResult",
-     [
-         QUERY_ID,
-         Feature("Result"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSampleScan",
-     [
-         QUERY_ID,
-         Feature("SampleScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSeqScan",
-     [
-         QUERY_ID,
-         Feature("Scan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSetOp",
-     [
-         QUERY_ID,
-         Feature("SetOp"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSort",
-     [
-         QUERY_ID,
-         Feature("Sort"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSubPlan",
-     [
-         QUERY_ID,
-         Feature("Plan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecSubqueryScan",
-     [
-         QUERY_ID,
-         Feature("SubqueryScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecTableFuncScan",
-     [
-         QUERY_ID,
-         Feature("TableFuncScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecTidScan",
-     [
-         QUERY_ID,
-         Feature("TidScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecUnique",
-     [
-         QUERY_ID,
-         Feature("Unique"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecValuesScan",
-     [
-         QUERY_ID,
-         Feature("ValuesScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecWindowAgg",
-     [
-         QUERY_ID,
-         Feature("WindowAgg"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
-     (WorkerType.BACKEND,)),
-    ("ExecWorkTableScan",
-     [
-         QUERY_ID,
-         Feature("WorkTableScan"),
-         LEFT_CHILD_NODE_ID,
-         RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
-     ],
+    # ("ExecAgg",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Agg"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecAppend",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Append"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecBitmapAnd",
+    #  [
+    #      QUERY_ID,
+    #      Feature("BitmapAnd"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecBitmapHeapScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("BitmapHeapScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecBitmapIndexScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("BitmapIndexScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecBitmapOr",
+    #  [
+    #      QUERY_ID,
+    #      Feature("BitmapOr"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecCteScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("CteScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecCustomScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("CustomScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecForeignScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("ForeignScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecFunctionScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("FunctionScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecGather",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Gather"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecGatherMerge",
+    #  [
+    #      QUERY_ID,
+    #      Feature("GatherMerge"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecGroup",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Group"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecHash",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Hash"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecHashJoinImpl",
+    #  [
+    #      QUERY_ID,
+    #      Feature("HashJoin"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecIncrementalSort",
+    #  [
+    #      QUERY_ID,
+    #      Feature("IncrementalSort"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecIndexOnlyScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("IndexOnlyScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecIndexScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("IndexScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecLimit",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Limit"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecLockRows",
+    #  [
+    #      QUERY_ID,
+    #      Feature("LockRows"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecMaterial",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Material"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecMemoize",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Memoize"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecMergeAppend",
+    #  [
+    #      QUERY_ID,
+    #      Feature("MergeAppend"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecMergeJoin",
+    #  [
+    #      QUERY_ID,
+    #      Feature("MergeJoin"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecModifyTable",
+    #  [
+    #      QUERY_ID,
+    #      Feature("ModifyTable"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecNamedTuplestoreScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("NamedTuplestoreScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecNestLoop",
+    #  [
+    #      QUERY_ID,
+    #      Feature("NestLoop"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecProjectSet",
+    #  [
+    #      QUERY_ID,
+    #      Feature("ProjectSet"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecRecursiveUnion",
+    #  [
+    #      QUERY_ID,
+    #      Feature("RecursiveUnion"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecResult",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Result"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSampleScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("SampleScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSeqScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Scan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSetOp",
+    #  [
+    #      QUERY_ID,
+    #      Feature("SetOp"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSort",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Sort"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSubPlan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Plan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecSubqueryScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("SubqueryScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecTableFuncScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("TableFuncScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecTidScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("TidScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecUnique",
+    #  [
+    #      QUERY_ID,
+    #      Feature("Unique"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecValuesScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("ValuesScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecWindowAgg",
+    #  [
+    #      QUERY_ID,
+    #      Feature("WindowAgg"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
+    #  (WorkerType.BACKEND,)),
+    # ("ExecWorkTableScan",
+    #  [
+    #      QUERY_ID,
+    #      Feature("WorkTableScan"),
+    #      LEFT_CHILD_NODE_ID,
+    #      RIGHT_CHILD_NODE_ID,
+    #      STATEMENT_TIMESTAMP
+    #  ],
      (WorkerType.BACKEND,)),
     ("do_autovacuum",
      [

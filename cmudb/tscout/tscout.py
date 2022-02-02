@@ -390,7 +390,7 @@ if __name__ == "__main__":
             output_event = tscout_bpf["postmaster_events"].event(data)
             event_type = output_event.type_
             child_pid = output_event.pid_
-            if event_type == 0 or event_type == 1:
+            if event_type == 1:
                 fd = output_event.socket_fd_ if event_type == 0 else None
                 create_collector(child_pid, model.WorkerType(event_type), fd)
             elif event_type == 2 or event_type == 3:

@@ -540,7 +540,22 @@ OU_DEFS = [
     #  (WorkerType.BACKEND,)),
     ("do_autovacuum",
      [
-         Feature("PgStat_StatTabEntry"),
+         Feature("tuples_inserted", readarg_p=False,
+                 bpf_tuple=(BPFVariable("tuples_inserted", clang.cindex.TypeKind.LONG),)),
+         Feature("tuples_updated", readarg_p=False,
+                 bpf_tuple=(BPFVariable("tuples_updated", clang.cindex.TypeKind.LONG),)),
+         Feature("tuples_deleted", readarg_p=False,
+                 bpf_tuple=(BPFVariable("tuples_deleted", clang.cindex.TypeKind.LONG),)),
+         Feature("tuples_hot_updated", readarg_p=False,
+                 bpf_tuple=(BPFVariable("tuples_hot_updated", clang.cindex.TypeKind.LONG),)),
+         Feature("n_live_tuples", readarg_p=False,
+                 bpf_tuple=(BPFVariable("n_live_tuples", clang.cindex.TypeKind.LONG),)),
+         Feature("n_dead_tuples", readarg_p=False,
+                 bpf_tuple=(BPFVariable("n_dead_tuples", clang.cindex.TypeKind.LONG),)),
+         Feature("changes_since_analyze", readarg_p=False,
+                 bpf_tuple=(BPFVariable("changes_since_analyze", clang.cindex.TypeKind.LONG),)),
+         Feature("inserts_since_vacuum", readarg_p=False,
+                 bpf_tuple=(BPFVariable("inserts_since_vacuum", clang.cindex.TypeKind.LONG),))
      ],
      (WorkerType.BACKGROUND,)),
 ]

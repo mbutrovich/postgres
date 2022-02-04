@@ -3018,7 +3018,9 @@ recheck_relation_needs_vacanalyze(Oid relid,
 							  effective_multixact_freeze_max_age,
 							  dovacuum, doanalyze, wraparound);
 
-        TS_MARKER(do_autovacuum_features, relid, tabentry);
+        TS_MARKER(do_autovacuum_features, relid, tabentry->tuples_inserted, tabentry->tuples_updated,
+                  tabentry->tuples_deleted, tabentry->tuples_hot_updated, tabentry->n_live_tuples,
+                  tabentry->n_dead_tuples, tabentry->changes_since_analyze, tabentry->inserts_since_vacuum);
 	/* ignore ANALYZE for toast tables */
 	if (classForm->relkind == RELKIND_TOASTVALUE)
 		*doanalyze = false;

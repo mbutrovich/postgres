@@ -72,6 +72,7 @@
 #include "storage/predicate.h"
 #include "storage/procarray.h"
 #include "storage/smgr.h"
+#include "tscout/marker.h"
 #include "utils/builtins.h"
 #include "utils/fmgroids.h"
 #include "utils/guc.h"
@@ -2906,6 +2907,8 @@ index_build(Relation heapRelation,
 	int			save_sec_context;
 	int			save_nestlevel;
 
+	TS_MARKER(index_build_features, RelationGetRelid(indexRelation), RelationGetRelid(heapRelation), indexInfo, heapRelation->rd_rel->reltuples);
+	TS_MARKER(index_build_begin, RelationGetRelid(indexRelation));
 	/*
 	 * sanity checks
 	 */
@@ -3073,6 +3076,9 @@ index_build(Relation heapRelation,
 
 	/* Restore userid and security context */
 	SetUserIdAndSecContext(save_userid, save_sec_context);
+
+        TS_MARKER(index_build_end, RelationGetRelid(indexRelation));
+        TS_MARKER(index_build_flush, RelationGetRelid(indexRelation));
 }
 
 /*

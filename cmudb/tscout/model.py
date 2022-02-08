@@ -489,6 +489,14 @@ OU_DEFS = [
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
      ]),
+    ("index_build",
+     [
+         Feature("heap_relid", readarg_p=False,
+                 bpf_tuple=(BPFVariable("heap_relid", clang.cindex.TypeKind.INT),)),
+         Feature("IndexInfo"),
+         Feature("heap_reltuples", readarg_p=False,
+                 bpf_tuple=(BPFVariable("heap_reltuples", clang.cindex.TypeKind.FLOAT),)),
+     ]),
 ]
 
 # The metrics to be defined for every OU. If you add anything to these metrics, consider if it should be accumulated

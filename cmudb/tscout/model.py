@@ -37,7 +37,7 @@ class BPFType(str, Enum):
 
 @dataclass
 class BPFVariable:
-    # TODO(Matt): Should this extend Field? Their members look very similar now. model doesn't know about clang_parser
+    # TODO(Matt): Should this extend Field? Their members look very similar now. However, model doesn't know about clang_parser
     #  and maybe it should stay that way.
     name: str
     c_type: clang.cindex.TypeKind
@@ -140,6 +140,10 @@ class Feature:
 @dataclass
 class Encoder:
     """
+    Contains logic for encoding a field that points to a complex type to a primitive 8-byte type. For example, rather
+    than discard a field that is a pointer to a List, we can change "feature-ize" that pointer in our output struct to
+    contain the length of the List being pointed to.
+
     type_name : str
         Originally type name in postgres to encode (i.e., List).
     return_type : clang.cindex.TypeKind
@@ -154,6 +158,11 @@ class Encoder:
     c_encoder: str
 
     def _encoder_name(self):
+        """
+        Returns
+        -------
+        Name of the encoder BPF C function.
+        """
         return f"encode_{self.type_name}"
 
     def encode_one_field(self, field_name):

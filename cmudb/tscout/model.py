@@ -223,6 +223,9 @@ class Encoder:
 # The following mass definitions look messy after auto-formatting.
 # fmt: off
 
+# The map below uses the original Postgres field type as the key (meaning it should be a pointer, since non-pointer
+# fields will have their structs unrolled). The value is the Encoder. See the documentation for the Encoder class for
+# more details about its fields.
 ENCODERS = {
     'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
   s32 encoded = 0;
@@ -627,6 +630,7 @@ OU_METRICS = (
     BPFVariable(name="cpu_id",
                 c_type=clang.cindex.TypeKind.UCHAR),
 )
+
 
 # fmt: on
 

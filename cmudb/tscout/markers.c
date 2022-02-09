@@ -109,6 +109,7 @@ void SUBST_OU_features(struct pt_regs *ctx) {
   // Copy features from USDT arg (pointer to features struct in NoisePage) to features struct.
   SUBST_READARGS;
 
+  // Encode any remaining features with defined Encoders.
   SUBST_ENCODERS;
 
   // Store the features, waiting for BEGIN(s), END(s), and FLUSH.

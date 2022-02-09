@@ -145,28 +145,32 @@ class Encoder:
     bpf_tuple: Tuple[BPFVariable] = None
 
     def encoder_name(self):
-        return f'encode_{self.type_name}'
+        return f"encode_{self.type_name}"
 
     def encode_one_field(self, field_name):
-        var_name = f'encoded_{field_name}'
-        one_field = [f'{CLANG_TO_BPF[self.return_type]} ',
-                     f'{var_name} = ',
-                     self.encoder_name(),
-                     f'(&(features->{field_name}));\n',
-                     f'features->{field_name} = ',
-                     f'{var_name};\n']
-        return ''.join(one_field)
+        var_name = f"encoded_{field_name}"
+        one_field = [
+            f"{CLANG_TO_BPF[self.return_type]} ",
+            f"{var_name} = ",
+            self.encoder_name(),
+            f"(&(features->{field_name}));\n",
+            f"features->{field_name} = ",
+            f"{var_name};\n",
+        ]
+        return "".join(one_field)
 
     def encoder_fn(self):
-        encoder = [f'static {CLANG_TO_BPF[self.return_type]} ',
-                   self.encoder_name(),
-                   '(void *raw_ptr) {\n',
-                   f'  struct DECL_{self.type_name} *cast_ptr;\n',
-                   f'  bpf_probe_read(&cast_ptr, sizeof(struct DECL_{self.type_name} *), raw_ptr);',
-                   self.c_encoder,
-                   f'  return ({CLANG_TO_BPF[self.return_type]})encoded;\n',
-                   '}\n\n']
-        return ''.join(encoder)
+        encoder = [
+            f"static {CLANG_TO_BPF[self.return_type]} ",
+            self.encoder_name(),
+            "(void *raw_ptr) {\n",
+            f"  struct DECL_{self.type_name} *cast_ptr;\n",
+            f"  bpf_probe_read(&cast_ptr, sizeof(struct DECL_{self.type_name} *), raw_ptr);",
+            self.c_encoder,
+            f"  return ({CLANG_TO_BPF[self.return_type]})encoded;\n",
+            "}\n\n",
+        ]
+        return "".join(encoder)
 
 
 # The following mass definitions look messy after auto-formatting.
@@ -581,11 +585,11 @@ OU_METRICS = (
 
 
 def struct_decl_for_fields(name, bpf_tuple):
-    decl = [f'struct DECL_{name}', '{']
+    decl = [f"struct DECL_{name}", "{"]
     for column in bpf_tuple:
-        decl.append(f'{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};')
-    decl.append('};\n')
-    return '\n'.join(decl)
+        decl.append(f"{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};")
+    decl.append("};\n")
+    return "\n".join(decl)
 
 
 @dataclass
@@ -706,10 +710,11 @@ class Model:
                     bpf_fields.append(
                         BPFVariable(
                             name=field.name,
-                            c_type=field.canonical_type_kind if field.pg_type not in ENCODERS else
-                            ENCODERS[field.pg_type].return_type,
+                            c_type=field.canonical_type_kind
+                            if field.pg_type not in ENCODERS
+                            else ENCODERS[field.pg_type].return_type,
                             pg_type=field.pg_type,
-                            alignment=field.alignment if i == 0 else None
+                            alignment=field.alignment if i == 0 else None,
                         )
                     )
                 except KeyError as e:
@@ -733,9 +738,7 @@ class Model:
                     continue
                 # Otherwise, convert the list of fields to BPF types.
                 bpf_fields = extract_bpf_fields(feature.name)
-                new_feature = Feature(feature.name,
-                                      bpf_tuple=bpf_fields,
-                                      readarg_p=True)
+                new_feature = Feature(feature.name, bpf_tuple=bpf_fields, readarg_p=True)
                 feature_list.append(new_feature)
 
             new_ou = OperatingUnit(postgres_function, feature_list)

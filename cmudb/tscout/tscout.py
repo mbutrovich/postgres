@@ -130,7 +130,7 @@ def generate_encoders(feature_list):
         for field in feature.bpf_tuple:
             if field.pg_type in model.ENCODERS:
                 code.append(model.ENCODERS[field.pg_type].encode_one_field(field.name))
-    return ''.join(code)
+    return "".join(code)
 
 
 def generate_markers(operation, ou_index):

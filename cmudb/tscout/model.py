@@ -151,11 +151,14 @@ class Encoder:
     c_encoder : str
         BPF C code to place a value in a stack variable named encoded from a pointer to type_name named cast_ptr.
         Please indent 2 spaces for debugging generated code.
+    bpf_tuple: Tuple[BPFVariable]
+        The fields of the complex type being encoded. We need this information to add to the HELPER_STRUCT_DEFS.
     """
 
     type_name: str
     return_type: clang.cindex.TypeKind
     c_encoder: str
+    bpf_tuple: Tuple[BPFVariable] = None
 
     def _encoder_name(self):
         """
@@ -636,6 +639,8 @@ OU_METRICS = (
 
 
 def struct_decl_for_fields(name, bpf_tuple):
+    assert bpf_tuple is not None, "We should have some fields in this struct."
+    assert len(bpf_tuple) > 0, "We should have some fields in this struct."
     decl = [f"struct DECL_{name}", "{"]
     for column in bpf_tuple:
         decl.append(f"{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};")

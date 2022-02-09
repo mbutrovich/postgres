@@ -139,12 +139,21 @@ class Feature:
 
 @dataclass
 class Encoder:
-    type_name: str
-    return_type: clang.cindex.TypeKind  # Must be an 8-byte type since it was originally a pointer.
-    c_encoder: str  # BPF C code with final encoded value in a stack variable named encoded. Please indent 2 spaces.
-    bpf_tuple: Tuple[BPFVariable] = None  # TODO(Matt): not used?
+    """
+    type_name : str
+        Originally type name in postgres to encode (i.e., List).
+    return_type : clang.cindex.TypeKind
+        Must be an 8-byte type since it was originally a pointer (i.e., s64).
+    c_encoder : str
+        BPF C code to place a value in a stack variable named encoded from a pointer to type_name named cast_ptr.
+        Please indent 2 spaces for debugging generated code.
+    """
 
-    def encoder_name(self):
+    type_name: str
+    return_type: clang.cindex.TypeKind
+    c_encoder: str
+
+    def _encoder_name(self):
         return f"encode_{self.type_name}"
 
     def encode_one_field(self, field_name):
@@ -164,7 +173,7 @@ class Encoder:
         one_field = [
             f"{CLANG_TO_BPF[self.return_type]} ",
             f"{var_name} = ",
-            self.encoder_name(),
+            self._encoder_name(),
             f"(&(features->{field_name}));\n",
             f"features->{field_name} = ",
             f"{var_name};\n",
@@ -191,7 +200,7 @@ class Encoder:
         """
         encoder = [
             f"static {CLANG_TO_BPF[self.return_type]} ",
-            self.encoder_name(),
+            self._encoder_name(),
             "(void *raw_ptr) {\n",
             f"  struct DECL_{self.type_name} *cast_ptr;\n",
             f"  bpf_probe_read(&cast_ptr, sizeof(struct DECL_{self.type_name} *), raw_ptr);",

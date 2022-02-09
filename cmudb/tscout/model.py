@@ -13,10 +13,9 @@ from enum import Enum, unique
 from typing import List, Mapping, Tuple
 
 import clang.cindex
-
 import clang_parser
 
-logger = logging.getLogger('tscout')
+logger = logging.getLogger("tscout")
 
 FLOAT_DOUBLE_NDIGITS = 3
 
@@ -24,15 +23,16 @@ FLOAT_DOUBLE_NDIGITS = 3
 @unique
 class BPFType(str, Enum):
     """BPF only has signed and unsigned integers."""
-    i8 = "s8"
-    i16 = "s16"
-    i32 = "s32"
-    i64 = "s64"
-    u8 = "u8"
-    u16 = "u16"
-    u32 = "u32"
-    u64 = "u64"
-    pointer = "void *"
+
+    I8 = "s8"
+    I16 = "s16"
+    I32 = "s32"
+    I64 = "s64"
+    U8 = "u8"
+    U16 = "u16"
+    U32 = "u32"
+    U64 = "u64"
+    POINTER = "void *"
 
 
 @dataclass
@@ -45,7 +45,7 @@ class BPFVariable:
     alignment: int = None  # Non-None for the first field of a struct, using alignment value of the struct.
 
     def alignment_string(self):
-        return ' __attribute__ ((aligned ({})))'.format(self.alignment) if self.alignment is not None else ''
+        return f" __attribute__ ((aligned ({self.alignment})))" if self.alignment is not None else ""
 
     def should_output(self):
         """
@@ -80,41 +80,41 @@ class BPFVariable:
             The serialized value of this variable.
         """
         if self.c_type == clang.cindex.TypeKind.FLOAT:
-            float_val = struct.unpack('f', getattr(output_event, self.name).to_bytes(4, byteorder=sys.byteorder))[0]
+            float_val = struct.unpack("f", getattr(output_event, self.name).to_bytes(4, byteorder=sys.byteorder))[0]
             float_val = round(float_val, FLOAT_DOUBLE_NDIGITS)
             return str(float_val)
-        elif self.c_type == clang.cindex.TypeKind.DOUBLE:
-            double_val = struct.unpack('d', getattr(output_event, self.name).to_bytes(8, byteorder=sys.byteorder))[0]
+        if self.c_type == clang.cindex.TypeKind.DOUBLE:
+            double_val = struct.unpack("d", getattr(output_event, self.name).to_bytes(8, byteorder=sys.byteorder))[0]
             double_val = round(double_val, FLOAT_DOUBLE_NDIGITS)
             return str(double_val)
-        else:
-            return str(getattr(output_event, self.name))
+
+        return str(getattr(output_event, self.name))
 
 
 # Map from Clang type kinds to BPF types.
 CLANG_TO_BPF = {
-    clang.cindex.TypeKind.BOOL: BPFType.u8,
-    clang.cindex.TypeKind.CHAR_U: BPFType.u8,
-    clang.cindex.TypeKind.UCHAR: BPFType.u8,
-    clang.cindex.TypeKind.USHORT: BPFType.u16,
-    clang.cindex.TypeKind.UINT: BPFType.u32,
-    clang.cindex.TypeKind.ULONG: BPFType.u64,
-    clang.cindex.TypeKind.ULONGLONG: BPFType.u64,
-    clang.cindex.TypeKind.CHAR_S: BPFType.i8,
-    clang.cindex.TypeKind.SCHAR: BPFType.i8,
-    clang.cindex.TypeKind.SHORT: BPFType.i16,
-    clang.cindex.TypeKind.INT: BPFType.i32,
-    clang.cindex.TypeKind.LONG: BPFType.i64,
-    clang.cindex.TypeKind.LONGLONG: BPFType.i64,
+    clang.cindex.TypeKind.BOOL: BPFType.U8,
+    clang.cindex.TypeKind.CHAR_U: BPFType.U8,
+    clang.cindex.TypeKind.UCHAR: BPFType.U8,
+    clang.cindex.TypeKind.USHORT: BPFType.U16,
+    clang.cindex.TypeKind.UINT: BPFType.U32,
+    clang.cindex.TypeKind.ULONG: BPFType.U64,
+    clang.cindex.TypeKind.ULONGLONG: BPFType.U64,
+    clang.cindex.TypeKind.CHAR_S: BPFType.I8,
+    clang.cindex.TypeKind.SCHAR: BPFType.I8,
+    clang.cindex.TypeKind.SHORT: BPFType.I16,
+    clang.cindex.TypeKind.INT: BPFType.I32,
+    clang.cindex.TypeKind.LONG: BPFType.I64,
+    clang.cindex.TypeKind.LONGLONG: BPFType.I64,
     # We memcpy floats and doubles into unsigned integer types of the same size because BPF doesn't support floating
     # point types. We later read this memory back as the original floating point type in user-space.
-    clang.cindex.TypeKind.FLOAT: BPFType.u32,
-    clang.cindex.TypeKind.DOUBLE: BPFType.u64,
-    clang.cindex.TypeKind.ENUM: BPFType.i32,
-    clang.cindex.TypeKind.POINTER: BPFType.pointer,
-    clang.cindex.TypeKind.FUNCTIONPROTO: BPFType.pointer,
-    clang.cindex.TypeKind.INCOMPLETEARRAY: BPFType.pointer,
-    clang.cindex.TypeKind.CONSTANTARRAY: BPFType.pointer,
+    clang.cindex.TypeKind.FLOAT: BPFType.U32,
+    clang.cindex.TypeKind.DOUBLE: BPFType.U64,
+    clang.cindex.TypeKind.ENUM: BPFType.I32,
+    clang.cindex.TypeKind.POINTER: BPFType.POINTER,
+    clang.cindex.TypeKind.FUNCTIONPROTO: BPFType.POINTER,
+    clang.cindex.TypeKind.INCOMPLETEARRAY: BPFType.POINTER,
+    clang.cindex.TypeKind.CONSTANTARRAY: BPFType.POINTER,
 }
 
 
@@ -131,6 +131,7 @@ class Feature:
     bpf_tuple : Tuple[BPFVariable]
         A tuple of all the BPF-typed variables that comprise this feature. First entry should have an alignment.
     """
+
     name: str
     readarg_p: bool = None
     bpf_tuple: Tuple[BPFVariable] = None
@@ -167,6 +168,9 @@ class Encoder:
                    '}\n\n']
         return ''.join(encoder)
 
+
+# The following mass definitions look messy after auto-formatting.
+# fmt: off
 
 ENCODERS = {
     'List *': Encoder(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_encoder="""
@@ -573,6 +577,8 @@ OU_METRICS = (
                 c_type=clang.cindex.TypeKind.UCHAR),
 )
 
+# fmt: on
+
 
 def struct_decl_for_fields(name, bpf_tuple):
     decl = [f'struct DECL_{name}', '{']
@@ -594,6 +600,7 @@ class OperatingUnit:
     features_list : List[Feature]
         A list of features.
     """
+
     function: str
     features_list: List[Feature]
 
@@ -601,16 +608,16 @@ class OperatingUnit:
         return self.function
 
     def begin_marker(self) -> str:
-        return self.name() + '_begin'
+        return self.name() + "_begin"
 
     def end_marker(self) -> str:
-        return self.name() + '_end'
+        return self.name() + "_end"
 
     def features_marker(self) -> str:
-        return self.name() + '_features'
+        return self.name() + "_features"
 
     def flush_marker(self) -> str:
-        return self.name() + '_flush'
+        return self.name() + "_flush"
 
     def features_struct(self) -> str:
         """
@@ -619,21 +626,23 @@ class OperatingUnit:
         C struct definition of all the features in the OU.
         """
 
-        struct_def = ''
+        struct_def = ""
 
         for feature in self.features_list:
             if feature.readarg_p:
                 # This Feature is actually a struct struct that readarg_p will memcpy from user-space.
-                assert (len(feature.bpf_tuple) >= 1), 'We should have some fields in this struct.'
+                assert len(feature.bpf_tuple) >= 1, "We should have some fields in this struct."
                 # Add all the struct's fields, sticking the original struct's alignment value on the first attribute.
                 for column in feature.bpf_tuple:
                     struct_def = struct_def + (
-                        '{} {}{};\n'.format(CLANG_TO_BPF[column.c_type], column.name, column.alignment_string()))
+                        f"{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};\n"
+                    )
             else:
                 # It's a single stack-allocated argument that we can read directly.
-                assert (len(feature.bpf_tuple) == 1), 'How can something not using readarg_p have multiple fields?'
+                assert len(feature.bpf_tuple) == 1, "How can something not using readarg_p have multiple fields?"
                 struct_def = struct_def + (
-                    '{} {};\n'.format(CLANG_TO_BPF[feature.bpf_tuple[0].c_type], feature.bpf_tuple[0].name))
+                    f"{CLANG_TO_BPF[feature.bpf_tuple[0].c_type]} {feature.bpf_tuple[0].name};\n"
+                )
 
         return struct_def
 
@@ -644,11 +653,8 @@ class OperatingUnit:
         Comma-separated string of all the features this OU outputs.
         This may not be all the features that comprise the OU.
         """
-        return ','.join(
-            column.name
-            for feature in self.features_list
-            for column in feature.bpf_tuple
-            if column.should_output()
+        return ",".join(
+            column.name for feature in self.features_list for column in feature.bpf_tuple if column.should_output()
         )
 
     def serialize_features(self, output_event) -> str:
@@ -666,7 +672,7 @@ class OperatingUnit:
         Comma-separated string of all the features this OU outputs.
         This may not be all the features that comprise the OU.
         """
-        return ','.join(
+        return ",".join(
             column.serialize(output_event)
             for feature in self.features_list
             for column in feature.bpf_tuple
@@ -708,10 +714,12 @@ class Model:
                     )
                 except KeyError as e:
                     logger.critical(
-                        'No mapping from Clang to BPF for type {} for field {} in the struct {}.'.format(e,
-                                                                                                         field.name,
-                                                                                                         feature.name))
-                    exit()
+                        "No mapping from Clang to BPF for type %s for field %s in the struct %s.",
+                        e,
+                        field.name,
+                        feature.name,
+                    )                                                                                    feature.name))
+                    sys.exit(1)
             return bpf_fields
 
         for postgres_function, features in OU_DEFS:
@@ -759,8 +767,6 @@ class Model:
         A map whose keys are the enumeration constants and values are the
         the corresponding values of the constants.
         """
-        assert (
-            enum_name in self._enums.keys()
-        ), f"Requested enum {enum_name} not in PostgreSQL code base."
+        assert enum_name in self._enums.keys(), f"Requested enum {enum_name} not in PostgreSQL code base."
 
         return {entry[0]: entry[1] for entry in self._enums[enum_name]}

@@ -141,8 +141,8 @@ class Feature:
 class Encoder:
     """
     Contains logic for encoding a field that points to a complex type to a primitive 8-byte type. For example, rather
-    than discard a field that is a pointer to a List, we can change "feature-ize" that pointer in our output struct to
-    contain the length of the List being pointed to.
+    than discard a field that is a pointer to a List, we "feature-ize" that pointer in our output struct to contain
+    the length of the List being pointed to.
 
     type_name : str
         Originally type name in postgres to encode (i.e., List).

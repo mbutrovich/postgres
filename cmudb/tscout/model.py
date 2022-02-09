@@ -718,7 +718,7 @@ class Model:
                         e,
                         field.name,
                         feature.name,
-                    )                                                                                    feature.name))
+                    )
                     sys.exit(1)
             return bpf_fields
 

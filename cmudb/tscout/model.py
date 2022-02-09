@@ -142,12 +142,24 @@ class Encoder:
     type_name: str
     return_type: clang.cindex.TypeKind  # Must be an 8-byte type since it was originally a pointer.
     c_encoder: str  # BPF C code with final encoded value in a stack variable named encoded. Please indent 2 spaces.
-    bpf_tuple: Tuple[BPFVariable] = None
+    bpf_tuple: Tuple[BPFVariable] = None  # TODO(Matt): not used?
 
     def encoder_name(self):
         return f"encode_{self.type_name}"
 
     def encode_one_field(self, field_name):
+        """
+        Generates the C code to call the encoder for a single field.
+        For example, for a field_name foo encoding a List *:
+
+        s64 encoded_foo = encode_List(&(features->foo));
+        features->foo = encoded_foo;
+
+        Parameters
+        ----------
+        field_name : str
+            The name of the field from the BPFVariable.
+        """
         var_name = f"encoded_{field_name}"
         one_field = [
             f"{CLANG_TO_BPF[self.return_type]} ",
@@ -160,6 +172,23 @@ class Encoder:
         return "".join(one_field)
 
     def encoder_fn(self):
+        """
+        Generates the C code to encode a single type. For example, to encode a List *:
+
+        static s64 encode_List(void *raw_ptr) {
+          struct DECL_List *cast_ptr;
+          bpf_probe_read(&cast_ptr, sizeof(struct DECL_List *), raw_ptr);
+          // contents of self.c_encoder, for List that is:
+          s32 encoded = 0;
+          bpf_probe_read(&encoded, sizeof(s32), &(cast_ptr->List_length));
+          // end of self.c_encoder
+          return (s64)encoded;
+        }
+
+        Returns
+        -------
+
+        """
         encoder = [
             f"static {CLANG_TO_BPF[self.return_type]} ",
             self.encoder_name(),

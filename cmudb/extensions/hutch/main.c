@@ -8,12 +8,11 @@
 
 #include "commands/createas.h"
 #include "commands/explain.h"
+#include "operating_unit_features.h"
 #include "optimizer/planner.h"
 #include "parser/parsetree.h"
-#include "utils/builtins.h"
-
 #include "tscout/marker.h"
-#include "operating_unit_features.h"
+#include "utils/builtins.h"
 
 PG_MODULE_MAGIC;
 void _PG_init(void);

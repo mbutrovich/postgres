@@ -38,18 +38,18 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
  * src/backend/executors/nodeHash.c
  * src/backend/executors/nodeHashjoin.c
  */
-#define TS_EXECUTOR_WRAPPER(node_type)                                           \
-  static TupleTableSlot *Exec##node_type(PlanState *pstate) {                    \
-    if (tscout_executor_running) {                                               \
-      TupleTableSlot *result;                                                    \
-      TS_MARKER(Exec##node_type##_begin, pstate->plan->plan_node_id,             \
+#define TS_EXECUTOR_WRAPPER(node_type)                                   \
+  static TupleTableSlot *Exec##node_type(PlanState *pstate) {            \
+    if (tscout_executor_running) {                                       \
+      TupleTableSlot *result;                                            \
+      TS_MARKER(Exec##node_type##_begin, pstate->plan->plan_node_id,     \
                 MemoryContextMemAllocated(TopTransactionContext, true)); \
-                                                                                 \
-      result = WrappedExec##node_type(pstate);                                   \
-                                                                                 \
-      TS_MARKER(Exec##node_type##_end, pstate->plan->plan_node_id,               \
+                                                                         \
+      result = WrappedExec##node_type(pstate);                           \
+                                                                         \
+      TS_MARKER(Exec##node_type##_end, pstate->plan->plan_node_id,       \
                 MemoryContextMemAllocated(TopTransactionContext, true)); \
-      return result;                                                             \
-    }                                                                            \
-    return WrappedExec##node_type(pstate);                                       \
+      return result;                                                     \
+    }                                                                    \
+    return WrappedExec##node_type(pstate);                               \
   }

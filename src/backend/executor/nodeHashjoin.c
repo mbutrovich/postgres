@@ -580,11 +580,11 @@ WrappedExecHashJoinImpl(PlanState *pstate, bool parallel)
 static pg_attribute_always_inline TupleTableSlot *
 ExecHashJoinImpl(PlanState *pstate, bool parallel) {
   TupleTableSlot *result;
-  TS_MARKER(ExecHashJoinImpl_begin, pstate->plan->plan_node_id);
+  TS_MARKER(ExecHashJoinImpl_begin, pstate->plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
 
   result = WrappedExecHashJoinImpl(pstate, parallel);
 
-  TS_MARKER(ExecHashJoinImpl_end, pstate->plan->plan_node_id);
+  TS_MARKER(ExecHashJoinImpl_end, pstate->plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
 
   return result;
 }

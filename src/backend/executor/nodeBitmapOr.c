@@ -191,11 +191,11 @@ Node *
 MultiExecBitmapOr(BitmapOrState *node) {
   if (tscout_executor_running) {
     Node *result;
-    TS_MARKER(ExecBitmapOr_begin, node->ps.plan->plan_node_id);
+    TS_MARKER(ExecBitmapOr_begin, node->ps.plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
 
     result = WrappedMultiExecBitmapOr(node);
 
-    TS_MARKER(ExecBitmapOr_end, node->ps.plan->plan_node_id);
+    TS_MARKER(ExecBitmapOr_end, node->ps.plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
     return result;
   }
   return WrappedMultiExecBitmapOr(node);

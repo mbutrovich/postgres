@@ -133,11 +133,11 @@ Node *
 MultiExecHash(HashState *node) {
   if (tscout_executor_running) {
     Node *result;
-    TS_MARKER(ExecHash_begin, node->ps.plan->plan_node_id);
+    TS_MARKER(ExecHash_begin, node->ps.plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
 
     result = WrappedMultiExecHash(node);
 
-    TS_MARKER(ExecHash_end, node->ps.plan->plan_node_id);
+    TS_MARKER(ExecHash_end, node->ps.plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
     return result;
   }
   return WrappedMultiExecHash(node);

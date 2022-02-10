@@ -37,6 +37,10 @@ void SUBST_OU_begin(struct pt_regs *ctx) {
     SUBST_OU_reset(ou_instance);
     return;
   }
+
+  // Collect a start memory usage and stash it for later.
+  bpf_usdt_readarg(2, ctx, &(metrics.memory_bytes));
+
   struct task_struct *p = (struct task_struct *)bpf_get_current_task();
   disk_start(&metrics, p);
 #ifdef CLIENT_SOCKET_FD
@@ -76,6 +80,17 @@ void SUBST_OU_end(struct pt_regs *ctx) {
     SUBST_OU_reset(ou_instance);
     return;
   }
+
+  // Collect an end memory usage and compute the difference.
+  u64 memory_end = 0;
+  u64 memory_bytes = 0;
+  bpf_usdt_readarg(2, ctx, &memory_end);
+  if (memory_end > metrics->memory_bytes) {
+    // TODO(Matt): Ignore if memory_bytes somehow goes down in this OU.
+    memory_bytes = memory_end - metrics->memory_bytes;
+  }
+  metrics->memory_bytes = memory_bytes;
+
   struct task_struct *p = (struct task_struct *)bpf_get_current_task();
   disk_end(metrics, p);
 #ifdef CLIENT_SOCKET_FD

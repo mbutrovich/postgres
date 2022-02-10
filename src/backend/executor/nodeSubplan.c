@@ -109,11 +109,11 @@ Datum pg_attribute_always_inline ExecSubPlan(SubPlanState *node,
               node->planstate->state->es_plannedstmt->queryId, node->planstate->plan,
               ChildPlanNodeId(node->planstate->plan->lefttree), ChildPlanNodeId(node->planstate->plan->righttree),
               GetCurrentStatementStartTimestamp());
-    TS_MARKER(ExecSubPlan_begin, node->planstate->plan->plan_node_id);
+    TS_MARKER(ExecSubPlan_begin, node->planstate->plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
 
     result = WrappedExecSubPlan(node, econtext, isNull);
 
-    TS_MARKER(ExecSubPlan_end, true, node->planstate->plan->plan_node_id);
+    TS_MARKER(ExecSubPlan_end, true, node->planstate->plan->plan_node_id, MemoryContextMemAllocated(TopTransactionContext, true));
     TS_MARKER(ExecSubPlan_flush, node->planstate->plan->plan_node_id);
     return result;
   }

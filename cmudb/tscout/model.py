@@ -170,6 +170,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Append"),
+         Feature("AppendState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -178,6 +179,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("BitmapAnd"),
+         Feature("BitmapAndState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -186,6 +188,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("BitmapHeapScan"),
+         Feature("BitmapHeapScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -194,6 +197,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("BitmapIndexScan"),
+         Feature("BitmapIndexScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -202,6 +206,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("BitmapOr"),
+         Feature("BitmapOrState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -210,6 +215,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("CteScan"),
+         Feature("CteScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -218,6 +224,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("CustomScan"),
+         Feature("CustomScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -226,6 +233,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("ForeignScan"),
+         Feature("ForeignScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -234,6 +242,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("FunctionScan"),
+         Feature("FunctionScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -242,6 +251,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Gather"),
+         Feature("GatherState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -250,6 +260,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("GatherMerge"),
+         Feature("GatherMergeState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -258,6 +269,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Group"),
+         Feature("GroupState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -266,6 +278,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Hash"),
+         Feature("HashState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -274,6 +287,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("HashJoin"),
+         Feature("HashJoinState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -282,6 +296,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("IncrementalSort"),
+         Feature("IncrementalSortState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -290,6 +305,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("IndexOnlyScan"),
+         Feature("IndexOnlyScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -298,6 +314,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("IndexScan"),
+         Feature("IndexScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -306,6 +323,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Limit"),
+         Feature("LimitState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -314,6 +332,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("LockRows"),
+         Feature("LockRowsState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -322,6 +341,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Material"),
+         Feature("MaterialState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -330,6 +350,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Memoize"),
+         Feature("MemoizeState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -338,6 +359,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("MergeAppend"),
+         Feature("MergeAppendState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -346,6 +368,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("MergeJoin"),
+         Feature("MergeJoinState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -354,6 +377,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("ModifyTable"),
+         Feature("ModifyTableState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -362,6 +386,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("NamedTuplestoreScan"),
+         Feature("NamedTuplestoreScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -370,6 +395,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("NestLoop"),
+         Feature("NestLoopState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -378,6 +404,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("ProjectSet"),
+         Feature("ProjectSetState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -386,6 +413,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("RecursiveUnion"),
+         Feature("RecursiveUnionState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -394,6 +422,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Result"),
+         Feature("ResultState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -402,6 +431,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("SampleScan"),
+         Feature("SampleScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -410,6 +440,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Scan"),
+         Feature("ScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -418,6 +449,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("SetOp"),
+         Feature("SetOpState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -426,6 +458,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Sort"),
+         Feature("SortState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -434,6 +467,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Plan"),
+         Feature("PlanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -442,6 +476,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("SubqueryScan"),
+         Feature("SubqueryScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -450,6 +485,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("TableFuncScan"),
+         Feature("TableFuncScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -458,6 +494,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("TidRangeScan"),
+         Feature("TidRangeScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -466,6 +503,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("TidScan"),
+         Feature("TidScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -474,6 +512,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Unique"),
+         Feature("UniqueState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -482,6 +521,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("ValuesScan"),
+         Feature("ValuesScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -490,6 +530,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("WindowAgg"),
+         Feature("WindowAggState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP
@@ -498,6 +539,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("WorkTableScan"),
+         Feature("WorkTableScanState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP

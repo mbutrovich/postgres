@@ -52,6 +52,7 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
   }
 
 // CustomScan is a jerk and named their node cscan instead, so I had to copy and paste this garbage there.
+// HashJoin is stupid too.
 #define TS_EXECUTOR_INIT(node_type, plan_node)                                                                       \
   node_type##State *ExecInit##node_type(node_type *node, EState *estate, int eflags) {                               \
     node_type##State *result;                                                                                        \

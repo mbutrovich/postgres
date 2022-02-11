@@ -768,7 +768,16 @@ WrappedExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
 	return hjstate;
 }
 
-TS_EXECUTOR_INIT(HashJoin, node->join.plan)
+HashJoinState *ExecInitHashJoin(HashJoin *node, EState *estate, int eflags) {
+  HashJoinState *result;
+  result = WrappedExecInitHashJoin(node, estate, eflags);
+  if (tscout_executor_running) {
+    TS_MARKER(ExecHashJoinImpl_features, (node->join.plan).plan_node_id, estate->es_plannedstmt->queryId,
+              &(node->join.plan), result, ChildPlanNodeId((node->join.plan).lefttree),
+              ChildPlanNodeId((node->join.plan).righttree), GetCurrentStatementStartTimestamp());
+  }
+  return result;
+}
 
 /* ----------------------------------------------------------------
  *		ExecEndHashJoin

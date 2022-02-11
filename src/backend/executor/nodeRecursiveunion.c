@@ -160,7 +160,7 @@ WrappedExecRecursiveUnion(PlanState *pstate)
 	return NULL;
 }
 
-TS_EXECUTOR_WRAPPER(RecursiveUnion)
+TS_EXECUTOR_EXEC(RecursiveUnion)
 
 /* ----------------------------------------------------------------
  *		ExecInitRecursiveUnion

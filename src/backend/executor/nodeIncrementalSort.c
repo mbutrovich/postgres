@@ -965,7 +965,7 @@ WrappedExecIncrementalSort(PlanState *pstate)
 	return slot;
 }
 
-TS_EXECUTOR_WRAPPER(IncrementalSort)
+TS_EXECUTOR_EXEC(IncrementalSort)
 
 /* ----------------------------------------------------------------
  *		ExecInitIncrementalSort

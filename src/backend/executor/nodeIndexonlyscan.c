@@ -320,7 +320,7 @@ WrappedExecIndexOnlyScan(PlanState *pstate)
 					(ExecScanRecheckMtd) IndexOnlyRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(IndexOnlyScan)
+TS_EXECUTOR_EXEC(IndexOnlyScan)
 
 /* ----------------------------------------------------------------
  *		ExecReScanIndexOnlyScan(node)

@@ -595,7 +595,7 @@ WrappedExecBitmapHeapScan(PlanState *pstate)
 					(ExecScanRecheckMtd) BitmapHeapRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(BitmapHeapScan)
+TS_EXECUTOR_EXEC(BitmapHeapScan)
 
 /* ----------------------------------------------------------------
  *		ExecReScanBitmapHeapScan(node)

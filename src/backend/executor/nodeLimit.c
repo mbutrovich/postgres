@@ -346,7 +346,7 @@ WrappedExecLimit(PlanState *pstate)
 	return slot;
 }
 
-TS_EXECUTOR_WRAPPER(Limit)
+TS_EXECUTOR_EXEC(Limit)
 
 /*
  * Evaluate the limit/offset expressions --- done at startup or rescan.

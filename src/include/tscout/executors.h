@@ -24,7 +24,7 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
 /*
  * Wrapper to add TScout markers to an executor. In the executor file, rename
  * the current Exec<blah> function to WrappedExec<blah> and then add
- * TS_EXECUTOR_WRAPPER<blah> beneath it. See src/backend/executors for examples.
+ * TS_EXECUTOR_EXEC<blah> beneath it. See src/backend/executors for examples.
  *
  * Some executors cannot use this macro due to function signature differences.
  * If the macro below changes, be sure to update those executors as well. The
@@ -37,7 +37,7 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
  * src/backend/executors/nodeHash.c
  * src/backend/executors/nodeHashjoin.c
  */
-#define TS_EXECUTOR_WRAPPER(node_type)                                \
+#define TS_EXECUTOR_EXEC(node_type)                                   \
   static TupleTableSlot *Exec##node_type(PlanState *pstate) {         \
     if (tscout_executor_running) {                                    \
       TupleTableSlot *result;                                         \
@@ -49,4 +49,16 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
       return result;                                                  \
     }                                                                 \
     return WrappedExec##node_type(pstate);                            \
+  }
+
+#define TS_EXECUTOR_INIT(node_type, plan_node)                                                                       \
+  node_type##State *ExecInit##node_type(node_type *node, EState *estate, int eflags) {                               \
+    node_type##State *result;                                                                                        \
+    result = WrappedExecInit##node_type(node, estate, eflags);                                                       \
+    if (tscout_executor_running) {                                                                                   \
+      TS_MARKER(Exec##node_type##_features, (plan_node).plan_node_id, estate->es_plannedstmt->queryId, &(plan_node), \
+                result, ChildPlanNodeId((plan_node).lefttree), ChildPlanNodeId((plan_node).righttree),               \
+                GetCurrentStatementStartTimestamp());                                                                \
+    }                                                                                                                \
+    return result;                                                                                                   \
   }

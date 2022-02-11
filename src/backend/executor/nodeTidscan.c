@@ -438,7 +438,7 @@ WrappedExecTidScan(PlanState *pstate)
 					(ExecScanRecheckMtd) TidRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(TidScan)
+TS_EXECUTOR_EXEC(TidScan)
 
 /* ----------------------------------------------------------------
  *		ExecReScanTidScan(node)

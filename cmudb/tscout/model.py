@@ -161,6 +161,7 @@ OU_DEFS = [
      [
          QUERY_ID,
          Feature("Agg"),
+         Feature("AggState"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
          STATEMENT_TIMESTAMP

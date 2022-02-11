@@ -140,7 +140,7 @@ WrappedExecResult(PlanState *pstate)
 	return NULL;
 }
 
-TS_EXECUTOR_WRAPPER(Result)
+TS_EXECUTOR_EXEC(Result)
 
 /* ----------------------------------------------------------------
  *		ExecResultMarkPos

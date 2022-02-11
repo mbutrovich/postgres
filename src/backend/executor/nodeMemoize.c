@@ -818,7 +818,7 @@ WrappedExecMemoize(PlanState *pstate)
 	}							/* switch */
 }
 
-TS_EXECUTOR_WRAPPER(Memoize)
+TS_EXECUTOR_EXEC(Memoize)
 
 MemoizeState *
 ExecInitMemoize(Memoize *node, EState *estate, int eflags)

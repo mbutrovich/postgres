@@ -282,7 +282,7 @@ WrappedExecGatherMerge(PlanState *pstate)
 	return ExecProject(node->ps.ps_ProjInfo);
 }
 
-TS_EXECUTOR_WRAPPER(GatherMerge)
+TS_EXECUTOR_EXEC(GatherMerge)
 
 /* ----------------------------------------------------------------
  *		ExecEndGatherMerge

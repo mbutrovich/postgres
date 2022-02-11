@@ -75,7 +75,7 @@ WrappedExecNamedTuplestoreScan(PlanState *pstate)
 					(ExecScanRecheckMtd) NamedTuplestoreScanRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(NamedTuplestoreScan)
+TS_EXECUTOR_EXEC(NamedTuplestoreScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitNamedTuplestoreScan

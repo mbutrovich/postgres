@@ -105,7 +105,7 @@ WrappedExecUnique(PlanState *pstate)
 	return ExecCopySlot(resultTupleSlot, slot);
 }
 
-TS_EXECUTOR_WRAPPER(Unique)
+TS_EXECUTOR_EXEC(Unique)
 
 /* ----------------------------------------------------------------
  *		ExecInitUnique

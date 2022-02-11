@@ -2646,7 +2646,7 @@ WrappedExecModifyTable(PlanState *pstate)
 	return NULL;
 }
 
-TS_EXECUTOR_WRAPPER(ModifyTable)
+TS_EXECUTOR_EXEC(ModifyTable)
 
 /*
  * ExecLookupResultRelByOid

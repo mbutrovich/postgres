@@ -2188,7 +2188,7 @@ WrappedExecAgg(PlanState *pstate)
 	return NULL;
 }
 
-TS_EXECUTOR_WRAPPER(Agg)
+TS_EXECUTOR_EXEC(Agg)
 
 /*
  * ExecAgg for non-hashed case
@@ -3249,8 +3249,8 @@ hashagg_reset_spill_state(AggState *aggstate)
  *
  * -----------------
  */
-AggState *
-ExecInitAgg(Agg *node, EState *estate, int eflags)
+static pg_attribute_always_inline AggState *
+WrappedExecInitAgg(Agg *node, EState *estate, int eflags)
 {
 	AggState   *aggstate;
 	AggStatePerAgg peraggs;
@@ -3275,8 +3275,6 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 	int			j = 0;
 	bool		use_hashing = (node->aggstrategy == AGG_HASHED ||
 							   node->aggstrategy == AGG_MIXED);
-
-    TS_EXECUTOR_FEATURES(Agg, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -4043,6 +4041,8 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 
 	return aggstate;
 }
+
+TS_EXECUTOR_INIT(Agg, node->plan)
 
 /*
  * Build the state needed to calculate a state value for an aggregate.

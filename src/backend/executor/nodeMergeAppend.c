@@ -281,7 +281,7 @@ WrappedExecMergeAppend(PlanState *pstate)
 	return result;
 }
 
-TS_EXECUTOR_WRAPPER(MergeAppend)
+TS_EXECUTOR_EXEC(MergeAppend)
 
 /*
  * Compare the tuples in the two given slots.

@@ -117,7 +117,7 @@ WrappedExecProjectSet(PlanState *pstate)
 	return NULL;
 }
 
-TS_EXECUTOR_WRAPPER(ProjectSet)
+TS_EXECUTOR_EXEC(ProjectSet)
 
 /* ----------------------------------------------------------------
  *		ExecProjectSRF

@@ -89,7 +89,7 @@ WrappedExecSampleScan(PlanState *pstate)
 					(ExecScanRecheckMtd) SampleRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(SampleScan)
+TS_EXECUTOR_EXEC(SampleScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitSampleScan

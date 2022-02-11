@@ -157,7 +157,7 @@ WrappedExecMaterial(PlanState *pstate)
 	return ExecClearTuple(slot);
 }
 
-TS_EXECUTOR_WRAPPER(Material)
+TS_EXECUTOR_EXEC(Material)
 
 /* ----------------------------------------------------------------
  *		ExecInitMaterial

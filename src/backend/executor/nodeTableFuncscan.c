@@ -103,7 +103,7 @@ WrappedExecTableFuncScan(PlanState *pstate)
 					(ExecScanRecheckMtd) TableFuncRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(TableFuncScan)
+TS_EXECUTOR_EXEC(TableFuncScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitTableFuncscan

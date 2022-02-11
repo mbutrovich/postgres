@@ -152,7 +152,7 @@ WrappedExecGroup(PlanState *pstate)
 	}
 }
 
-TS_EXECUTOR_WRAPPER(Group)
+TS_EXECUTOR_EXEC(Group)
 
 /* -----------------
  * ExecInitGroup

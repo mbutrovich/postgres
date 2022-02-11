@@ -90,7 +90,7 @@ WrappedExecSubqueryScan(PlanState *pstate)
 					(ExecScanRecheckMtd) SubqueryRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(SubqueryScan)
+TS_EXECUTOR_EXEC(SubqueryScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitSubqueryScan

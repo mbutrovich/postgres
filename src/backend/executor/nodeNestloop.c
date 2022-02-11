@@ -256,7 +256,7 @@ WrappedExecNestLoop(PlanState *pstate)
 	}
 }
 
-TS_EXECUTOR_WRAPPER(NestLoop)
+TS_EXECUTOR_EXEC(NestLoop)
 
 /* ----------------------------------------------------------------
  *		ExecInitNestLoop

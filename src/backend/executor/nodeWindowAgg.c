@@ -2239,7 +2239,7 @@ WrappedExecWindowAgg(PlanState *pstate)
 	return ExecProject(winstate->ss.ps.ps_ProjInfo);
 }
 
-TS_EXECUTOR_WRAPPER(WindowAgg)
+TS_EXECUTOR_EXEC(WindowAgg)
 
 /* -----------------
  * ExecInitWindowAgg

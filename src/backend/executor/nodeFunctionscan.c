@@ -273,7 +273,7 @@ WrappedExecFunctionScan(PlanState *pstate)
 					(ExecScanRecheckMtd) FunctionRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(FunctionScan)
+TS_EXECUTOR_EXEC(FunctionScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitFunctionScan

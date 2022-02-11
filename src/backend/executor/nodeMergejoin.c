@@ -1429,7 +1429,7 @@ WrappedExecMergeJoin(PlanState *pstate)
 	}
 }
 
-TS_EXECUTOR_WRAPPER(MergeJoin)
+TS_EXECUTOR_EXEC(MergeJoin)
 
 /* ----------------------------------------------------------------
  *		ExecInitMergeJoin

@@ -221,7 +221,7 @@ WrappedExecSetOp(PlanState *pstate)
 		return setop_retrieve_direct(node);
 }
 
-TS_EXECUTOR_WRAPPER(SetOp)
+TS_EXECUTOR_EXEC(SetOp)
 
 /*
  * ExecSetOp for non-hashed case

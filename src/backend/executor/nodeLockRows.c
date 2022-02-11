@@ -282,7 +282,7 @@ lnext:
 	return slot;
 }
 
-TS_EXECUTOR_WRAPPER(LockRows)
+TS_EXECUTOR_EXEC(LockRows)
 
 /* ----------------------------------------------------------------
  *		ExecInitLockRows

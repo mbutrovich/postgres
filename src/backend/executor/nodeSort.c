@@ -157,7 +157,7 @@ WrappedExecSort(PlanState *pstate)
 	return slot;
 }
 
-TS_EXECUTOR_WRAPPER(Sort)
+TS_EXECUTOR_EXEC(Sort)
 
 /* ----------------------------------------------------------------
  *		ExecInitSort

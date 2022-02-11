@@ -118,7 +118,7 @@ WrappedExecCustomScan(PlanState *pstate)
 	return node->methods->ExecCustomScan(node);
 }
 
-TS_EXECUTOR_WRAPPER(CustomScan)
+TS_EXECUTOR_EXEC(CustomScan)
 
 void
 ExecEndCustomScan(CustomScanState *node)

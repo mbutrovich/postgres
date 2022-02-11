@@ -204,7 +204,7 @@ WrappedExecValuesScan(PlanState *pstate)
 					(ExecScanRecheckMtd) ValuesRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(ValuesScan)
+TS_EXECUTOR_EXEC(ValuesScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitValuesScan

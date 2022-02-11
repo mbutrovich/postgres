@@ -167,7 +167,7 @@ WrappedExecCteScan(PlanState *pstate)
 					(ExecScanRecheckMtd) CteScanRecheck);
 }
 
-TS_EXECUTOR_WRAPPER(CteScan)
+TS_EXECUTOR_EXEC(CteScan)
 
 /* ----------------------------------------------------------------
  *		ExecInitCteScan

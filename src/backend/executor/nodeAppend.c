@@ -385,7 +385,7 @@ WrappedExecAppend(PlanState *pstate)
 			return ExecClearTuple(node->ps.ps_ResultTupleSlot);
 	}
 }
-TS_EXECUTOR_WRAPPER(Append)
+TS_EXECUTOR_EXEC(Append)
 
 /* ----------------------------------------------------------------
  *		ExecEndAppend

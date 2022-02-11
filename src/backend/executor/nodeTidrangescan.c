@@ -327,7 +327,7 @@ ExecEndTidRangeScan(TidRangeScanState *node)
 {
 	TableScanDesc scan = node->ss.ss_currentScanDesc;
 
-        TS_EXECUTOR_FLUSH(IndexScan, node->ss.ps.plan);
+        TS_EXECUTOR_FLUSH(TidRangeScan, node->ss.ps.plan);
 
 	if (scan != NULL)
 		table_endscan(scan);

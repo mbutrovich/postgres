@@ -145,7 +145,6 @@ def generate_markers(operation, ou_index):
 
 
 def collector(collector_flags, ou_processor_queues, pid, worker_type, socket_fd):
-    global helper_struct_defs
     setproctitle.setproctitle(f"{pid} TScout Collector")
 
     # Read the C code for the Collector.

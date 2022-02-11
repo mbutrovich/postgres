@@ -262,12 +262,10 @@ TS_EXECUTOR_EXEC(NestLoop)
  *		ExecInitNestLoop
  * ----------------------------------------------------------------
  */
-NestLoopState *
-ExecInitNestLoop(NestLoop *node, EState *estate, int eflags)
+static pg_attribute_always_inline NestLoopState *
+WrappedExecInitNestLoop(NestLoop *node, EState *estate, int eflags)
 {
 	NestLoopState *nlstate;
-
-        TS_EXECUTOR_FEATURES(NestLoop, node->join.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -356,6 +354,8 @@ ExecInitNestLoop(NestLoop *node, EState *estate, int eflags)
 
 	return nlstate;
 }
+
+TS_EXECUTOR_INIT(NestLoop, node->join.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndNestLoop

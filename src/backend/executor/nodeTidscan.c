@@ -499,13 +499,11 @@ ExecEndTidScan(TidScanState *node)
  *		  estate: the execution state initialized in InitPlan.
  * ----------------------------------------------------------------
  */
-TidScanState *
-ExecInitTidScan(TidScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline TidScanState *
+WrappedExecInitTidScan(TidScan *node, EState *estate, int eflags)
 {
 	TidScanState *tidstate;
 	Relation	currentRelation;
-        
-        TS_EXECUTOR_FEATURES(TidScan, node->scan.plan);
 
 	/*
 	 * create state structure
@@ -563,3 +561,5 @@ ExecInitTidScan(TidScan *node, EState *estate, int eflags)
 	 */
 	return tidstate;
 }
+
+TS_EXECUTOR_INIT(TidScan, node->scan.plan)

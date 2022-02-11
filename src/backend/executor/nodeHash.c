@@ -365,12 +365,10 @@ MultiExecParallelHash(HashState *node)
  *		Init routine for Hash node
  * ----------------------------------------------------------------
  */
-HashState *
-ExecInitHash(Hash *node, EState *estate, int eflags)
+static pg_attribute_always_inline HashState *
+WrappedExecInitHash(Hash *node, EState *estate, int eflags)
 {
 	HashState  *hashstate;
-
-        TS_EXECUTOR_FEATURES(Hash, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -413,6 +411,8 @@ ExecInitHash(Hash *node, EState *estate, int eflags)
 
 	return hashstate;
 }
+
+TS_EXECUTOR_INIT(Hash, node->plan)
 
 /* ---------------------------------------------------------------
  *		ExecEndHash

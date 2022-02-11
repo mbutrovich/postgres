@@ -2248,8 +2248,8 @@ TS_EXECUTOR_EXEC(WindowAgg)
  *	planner and initializes its outer subtree
  * -----------------
  */
-WindowAggState *
-ExecInitWindowAgg(WindowAgg *node, EState *estate, int eflags)
+static pg_attribute_always_inline WindowAggState *
+WrappedExecInitWindowAgg(WindowAgg *node, EState *estate, int eflags)
 {
 	WindowAggState *winstate;
 	Plan	   *outerPlan;
@@ -2264,8 +2264,6 @@ ExecInitWindowAgg(WindowAgg *node, EState *estate, int eflags)
 				aggno;
 	TupleDesc	scanDesc;
 	ListCell   *l;
-
-        TS_EXECUTOR_FEATURES(WindowAgg, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -2529,6 +2527,8 @@ ExecInitWindowAgg(WindowAgg *node, EState *estate, int eflags)
 
 	return winstate;
 }
+
+TS_EXECUTOR_INIT(WindowAgg, node->plan)
 
 /* -----------------
  * ExecEndWindowAgg

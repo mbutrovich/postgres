@@ -163,13 +163,11 @@ TS_EXECUTOR_EXEC(Material)
  *		ExecInitMaterial
  * ----------------------------------------------------------------
  */
-MaterialState *
-ExecInitMaterial(Material *node, EState *estate, int eflags)
+static pg_attribute_always_inline MaterialState *
+WrappedExecInitMaterial(Material *node, EState *estate, int eflags)
 {
 	MaterialState *matstate;
 	Plan	   *outerPlan;
-
-        TS_EXECUTOR_FEATURES(Material, node->plan);
 
 	/*
 	 * create state structure
@@ -236,6 +234,8 @@ ExecInitMaterial(Material *node, EState *estate, int eflags)
 
 	return matstate;
 }
+
+TS_EXECUTOR_INIT(Material, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndMaterial

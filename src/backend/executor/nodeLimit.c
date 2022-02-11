@@ -447,13 +447,11 @@ compute_tuples_needed(LimitState *node)
  *		the node's subplan.
  * ----------------------------------------------------------------
  */
-LimitState *
-ExecInitLimit(Limit *node, EState *estate, int eflags)
+static pg_attribute_always_inline LimitState *
+WrappedExecInitLimit(Limit *node, EState *estate, int eflags)
 {
 	LimitState *limitstate;
 	Plan	   *outerPlan;
-
-        TS_EXECUTOR_FEATURES(Limit, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -528,6 +526,8 @@ ExecInitLimit(Limit *node, EState *estate, int eflags)
 
 	return limitstate;
 }
+
+TS_EXECUTOR_INIT(Limit, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndLimit

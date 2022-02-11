@@ -109,15 +109,13 @@ TS_EXECUTOR_EXEC(TableFuncScan)
  *		ExecInitTableFuncscan
  * ----------------------------------------------------------------
  */
-TableFuncScanState *
-ExecInitTableFuncScan(TableFuncScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline TableFuncScanState *
+WrappedExecInitTableFuncScan(TableFuncScan *node, EState *estate, int eflags)
 {
 	TableFuncScanState *scanstate;
 	TableFunc  *tf = node->tablefunc;
 	TupleDesc	tupdesc;
 	int			i;
-
-        TS_EXECUTOR_FEATURES(TableFuncScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -208,6 +206,8 @@ ExecInitTableFuncScan(TableFuncScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(TableFuncScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndTableFuncscan

@@ -291,15 +291,13 @@ TS_EXECUTOR_EXEC(LockRows)
  *		the node's subplan.
  * ----------------------------------------------------------------
  */
-LockRowsState *
-ExecInitLockRows(LockRows *node, EState *estate, int eflags)
+static pg_attribute_always_inline LockRowsState *
+WrappedExecInitLockRows(LockRows *node, EState *estate, int eflags)
 {
 	LockRowsState *lrstate;
 	Plan	   *outerPlan = outerPlan(node);
 	List	   *epq_arowmarks;
 	ListCell   *lc;
-
-        TS_EXECUTOR_FEATURES(LockRows, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -379,6 +377,8 @@ ExecInitLockRows(LockRows *node, EState *estate, int eflags)
 
 	return lrstate;
 }
+
+TS_EXECUTOR_INIT(LockRows, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndLockRows

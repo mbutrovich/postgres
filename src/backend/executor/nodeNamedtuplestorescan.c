@@ -81,13 +81,11 @@ TS_EXECUTOR_EXEC(NamedTuplestoreScan)
  *		ExecInitNamedTuplestoreScan
  * ----------------------------------------------------------------
  */
-NamedTuplestoreScanState *
-ExecInitNamedTuplestoreScan(NamedTuplestoreScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline NamedTuplestoreScanState *
+WrappedExecInitNamedTuplestoreScan(NamedTuplestoreScan *node, EState *estate, int eflags)
 {
 	NamedTuplestoreScanState *scanstate;
 	EphemeralNamedRelation enr;
-
-        TS_EXECUTOR_FEATURES(NamedTuplestoreScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -158,6 +156,8 @@ ExecInitNamedTuplestoreScan(NamedTuplestoreScan *node, EState *estate, int eflag
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(NamedTuplestoreScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndNamedTuplestoreScan

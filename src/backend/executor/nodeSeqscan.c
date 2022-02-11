@@ -121,12 +121,10 @@ TS_EXECUTOR_EXEC(SeqScan)
  *		ExecInitSeqScan
  * ----------------------------------------------------------------
  */
-SeqScanState *
-ExecInitSeqScan(SeqScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline SeqScanState *
+WrappedExecInitSeqScan(SeqScan *node, EState *estate, int eflags)
 {
 	SeqScanState *scanstate;
-
-        TS_EXECUTOR_FEATURES(SeqScan, node->plan);
 
 	/*
 	 * Once upon a time it was possible to have an outerPlan of a SeqScan, but
@@ -177,6 +175,8 @@ ExecInitSeqScan(SeqScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(SeqScan, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndSeqScan

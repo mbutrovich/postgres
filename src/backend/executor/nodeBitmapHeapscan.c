@@ -707,13 +707,11 @@ ExecEndBitmapHeapScan(BitmapHeapScanState *node)
  *		Initializes the scan's state information.
  * ----------------------------------------------------------------
  */
-BitmapHeapScanState *
-ExecInitBitmapHeapScan(BitmapHeapScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline BitmapHeapScanState *
+WrappedExecInitBitmapHeapScan(BitmapHeapScan *node, EState *estate, int eflags)
 {
 	BitmapHeapScanState *scanstate;
 	Relation	currentRelation;
-
-        TS_EXECUTOR_FEATURES(BitmapHeapScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -816,6 +814,8 @@ ExecInitBitmapHeapScan(BitmapHeapScan *node, EState *estate, int eflags)
 	 */
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(BitmapHeapScan, node->scan.plan)
 
 /*----------------
  *		BitmapShouldInitializeSharedState

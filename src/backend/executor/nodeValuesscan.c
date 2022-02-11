@@ -210,16 +210,14 @@ TS_EXECUTOR_EXEC(ValuesScan)
  *		ExecInitValuesScan
  * ----------------------------------------------------------------
  */
-ValuesScanState *
-ExecInitValuesScan(ValuesScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline ValuesScanState *
+WrappedExecInitValuesScan(ValuesScan *node, EState *estate, int eflags)
 {
 	ValuesScanState *scanstate;
 	TupleDesc	tupdesc;
 	ListCell   *vtl;
 	int			i;
 	PlanState  *planstate;
-
-        TS_EXECUTOR_FEATURES(ValuesScan, node->scan.plan);
 
 	/*
 	 * ValuesScan should not have any children.
@@ -323,6 +321,8 @@ ExecInitValuesScan(ValuesScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(ValuesScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndValuesScan

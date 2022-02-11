@@ -279,8 +279,8 @@ TS_EXECUTOR_EXEC(FunctionScan)
  *		ExecInitFunctionScan
  * ----------------------------------------------------------------
  */
-FunctionScanState *
-ExecInitFunctionScan(FunctionScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline FunctionScanState *
+WrappedExecInitFunctionScan(FunctionScan *node, EState *estate, int eflags)
 {
 	FunctionScanState *scanstate;
 	int			nfuncs = list_length(node->functions);
@@ -288,8 +288,6 @@ ExecInitFunctionScan(FunctionScan *node, EState *estate, int eflags)
 	int			i,
 				natts;
 	ListCell   *lc;
-
-        TS_EXECUTOR_FEATURES(FunctionScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -516,6 +514,8 @@ ExecInitFunctionScan(FunctionScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(FunctionScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndFunctionScan

@@ -55,14 +55,12 @@ static void ExecShutdownGatherWorkers(GatherState *node);
  *		ExecInitGather
  * ----------------------------------------------------------------
  */
-GatherState *
-ExecInitGather(Gather *node, EState *estate, int eflags)
+static pg_attribute_always_inline GatherState *
+WrappedExecInitGather(Gather *node, EState *estate, int eflags)
 {
 	GatherState *gatherstate;
 	Plan	   *outerNode;
 	TupleDesc	tupDesc;
-
-        TS_EXECUTOR_FEATURES(Gather, node->plan);
 
 	/* Gather node doesn't have innerPlan node. */
 	Assert(innerPlan(node) == NULL);
@@ -133,6 +131,8 @@ ExecInitGather(Gather *node, EState *estate, int eflags)
 
 	return gatherstate;
 }
+
+TS_EXECUTOR_INIT(Gather, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecGather(node)

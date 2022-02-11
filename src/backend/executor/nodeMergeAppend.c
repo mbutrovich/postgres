@@ -62,8 +62,8 @@ static int	heap_compare_slots(Datum a, Datum b, void *arg);
  *		Begin all of the subscans of the MergeAppend node.
  * ----------------------------------------------------------------
  */
-MergeAppendState *
-ExecInitMergeAppend(MergeAppend *node, EState *estate, int eflags)
+static pg_attribute_always_inline MergeAppendState *
+WrappedExecInitMergeAppend(MergeAppend *node, EState *estate, int eflags)
 {
 	MergeAppendState *mergestate = makeNode(MergeAppendState);
 	PlanState **mergeplanstates;
@@ -71,8 +71,6 @@ ExecInitMergeAppend(MergeAppend *node, EState *estate, int eflags)
 	int			nplans;
 	int			i,
 				j;
-
-        TS_EXECUTOR_FEATURES(MergeAppend, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -204,6 +202,8 @@ ExecInitMergeAppend(MergeAppend *node, EState *estate, int eflags)
 
 	return mergestate;
 }
+
+TS_EXECUTOR_INIT(MergeAppend, node->plan)
 
 /* ----------------------------------------------------------------
  *	   ExecMergeAppend

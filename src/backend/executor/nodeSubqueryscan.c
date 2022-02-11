@@ -96,12 +96,10 @@ TS_EXECUTOR_EXEC(SubqueryScan)
  *		ExecInitSubqueryScan
  * ----------------------------------------------------------------
  */
-SubqueryScanState *
-ExecInitSubqueryScan(SubqueryScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline SubqueryScanState *
+WrappedExecInitSubqueryScan(SubqueryScan *node, EState *estate, int eflags)
 {
 	SubqueryScanState *subquerystate;
-
-        TS_EXECUTOR_FEATURES(SubqueryScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -162,6 +160,8 @@ ExecInitSubqueryScan(SubqueryScan *node, EState *estate, int eflags)
 
 	return subquerystate;
 }
+
+TS_EXECUTOR_INIT(SubqueryScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndSubqueryScan

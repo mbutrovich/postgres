@@ -1435,15 +1435,13 @@ TS_EXECUTOR_EXEC(MergeJoin)
  *		ExecInitMergeJoin
  * ----------------------------------------------------------------
  */
-MergeJoinState *
-ExecInitMergeJoin(MergeJoin *node, EState *estate, int eflags)
+static pg_attribute_always_inline MergeJoinState *
+WrappedExecInitMergeJoin(MergeJoin *node, EState *estate, int eflags)
 {
 	MergeJoinState *mergestate;
 	TupleDesc	outerDesc,
 				innerDesc;
 	const TupleTableSlotOps *innerOps;
-
-        TS_EXECUTOR_FEATURES(MergeJoin, node->join.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -1625,6 +1623,8 @@ ExecInitMergeJoin(MergeJoin *node, EState *estate, int eflags)
 
 	return mergestate;
 }
+
+TS_EXECUTOR_INIT(MergeJoin, node->join.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndMergeJoin

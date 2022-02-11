@@ -95,14 +95,12 @@ TS_EXECUTOR_EXEC(SampleScan)
  *		ExecInitSampleScan
  * ----------------------------------------------------------------
  */
-SampleScanState *
-ExecInitSampleScan(SampleScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline SampleScanState *
+WrappedExecInitSampleScan(SampleScan *node, EState *estate, int eflags)
 {
 	SampleScanState *scanstate;
 	TableSampleClause *tsc = node->tablesample;
 	TsmRoutine *tsm;
-
-        TS_EXECUTOR_FEATURES(SampleScan, node->scan.plan);
 
 	Assert(outerPlan(node) == NULL);
 	Assert(innerPlan(node) == NULL);
@@ -176,6 +174,8 @@ ExecInitSampleScan(SampleScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(SampleScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndSampleScan

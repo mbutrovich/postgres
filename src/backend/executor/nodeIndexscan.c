@@ -901,14 +901,12 @@ ExecIndexRestrPos(IndexScanState *node)
  *			  index relation.
  * ----------------------------------------------------------------
  */
-IndexScanState *
-ExecInitIndexScan(IndexScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline IndexScanState *
+WrappedExecInitIndexScan(IndexScan *node, EState *estate, int eflags)
 {
 	IndexScanState *indexstate;
 	Relation	currentRelation;
 	LOCKMODE	lockmode;
-
-        TS_EXECUTOR_FEATURES(IndexScan, node->scan.plan);
 
 	/*
 	 * create state structure
@@ -1092,6 +1090,7 @@ ExecInitIndexScan(IndexScan *node, EState *estate, int eflags)
 	return indexstate;
 }
 
+TS_EXECUTOR_INIT(IndexScan, node->scan.plan)
 
 /*
  * ExecIndexBuildScanKeys

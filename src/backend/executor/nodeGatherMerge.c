@@ -69,14 +69,12 @@ static void load_tuple_array(GatherMergeState *gm_state, int reader);
  *		ExecInitGather
  * ----------------------------------------------------------------
  */
-GatherMergeState *
-ExecInitGatherMerge(GatherMerge *node, EState *estate, int eflags)
+static pg_attribute_always_inline GatherMergeState *
+WrappedExecInitGatherMerge(GatherMerge *node, EState *estate, int eflags)
 {
 	GatherMergeState *gm_state;
 	Plan	   *outerNode;
 	TupleDesc	tupDesc;
-
-        TS_EXECUTOR_FEATURES(GatherMerge, node->plan);
 
 	/* Gather merge node doesn't have innerPlan node. */
 	Assert(innerPlan(node) == NULL);
@@ -179,6 +177,8 @@ ExecInitGatherMerge(GatherMerge *node, EState *estate, int eflags)
 
 	return gm_state;
 }
+
+TS_EXECUTOR_INIT(GatherMerge, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecGatherMerge(node)

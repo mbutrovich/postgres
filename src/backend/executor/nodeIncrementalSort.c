@@ -974,12 +974,10 @@ TS_EXECUTOR_EXEC(IncrementalSort)
  *		produced by the planner and initializes its outer subtree.
  * ----------------------------------------------------------------
  */
-IncrementalSortState *
-ExecInitIncrementalSort(IncrementalSort *node, EState *estate, int eflags)
+static pg_attribute_always_inline IncrementalSortState *
+WrappedExecInitIncrementalSort(IncrementalSort *node, EState *estate, int eflags)
 {
 	IncrementalSortState *incrsortstate;
-
-        TS_EXECUTOR_FEATURES(IncrementalSort, node->sort.plan)
 
 	SO_printf("ExecInitIncrementalSort: initializing sort node\n");
 
@@ -1072,6 +1070,8 @@ ExecInitIncrementalSort(IncrementalSort *node, EState *estate, int eflags)
 
 	return incrsortstate;
 }
+
+TS_EXECUTOR_INIT(IncrementalSort, node->sort.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndIncrementalSort(node)

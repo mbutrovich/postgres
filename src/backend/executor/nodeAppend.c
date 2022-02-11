@@ -106,8 +106,8 @@ static void classify_matching_subplans(AppendState *node);
  *		block instead of that of the call to ExecAppend.)
  * ----------------------------------------------------------------
  */
-AppendState *
-ExecInitAppend(Append *node, EState *estate, int eflags)
+static pg_attribute_always_inline AppendState *
+WrappedExecInitAppend(Append *node, EState *estate, int eflags)
 {
 	AppendState *appendstate = makeNode(AppendState);
 	PlanState **appendplanstates;
@@ -118,8 +118,6 @@ ExecInitAppend(Append *node, EState *estate, int eflags)
 	int			firstvalid;
 	int			i,
 				j;
-
-        TS_EXECUTOR_FEATURES(Append, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -290,6 +288,8 @@ ExecInitAppend(Append *node, EState *estate, int eflags)
 	return appendstate;
 }
 
+TS_EXECUTOR_INIT(Append, node->plan)
+
 /* ----------------------------------------------------------------
  *	   ExecAppend
  *
@@ -385,6 +385,7 @@ WrappedExecAppend(PlanState *pstate)
 			return ExecClearTuple(node->ps.ps_ResultTupleSlot);
 	}
 }
+
 TS_EXECUTOR_EXEC(Append)
 
 /* ----------------------------------------------------------------

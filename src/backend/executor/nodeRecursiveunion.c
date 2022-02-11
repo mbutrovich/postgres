@@ -166,13 +166,11 @@ TS_EXECUTOR_EXEC(RecursiveUnion)
  *		ExecInitRecursiveUnion
  * ----------------------------------------------------------------
  */
-RecursiveUnionState *
-ExecInitRecursiveUnion(RecursiveUnion *node, EState *estate, int eflags)
+static pg_attribute_always_inline RecursiveUnionState *
+WrappedExecInitRecursiveUnion(RecursiveUnion *node, EState *estate, int eflags)
 {
 	RecursiveUnionState *rustate;
 	ParamExecData *prmdata;
-
-        TS_EXECUTOR_FEATURES(RecursiveUnion, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -266,6 +264,8 @@ ExecInitRecursiveUnion(RecursiveUnion *node, EState *estate, int eflags)
 
 	return rustate;
 }
+
+TS_EXECUTOR_INIT(RecursiveUnion, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndRecursiveUnion

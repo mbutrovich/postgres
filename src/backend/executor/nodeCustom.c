@@ -26,15 +26,13 @@
 static TupleTableSlot *ExecCustomScan(PlanState *pstate);
 
 
-CustomScanState *
-ExecInitCustomScan(CustomScan *cscan, EState *estate, int eflags)
+static pg_attribute_always_inline CustomScanState *
+WrappedExecInitCustomScan(CustomScan *cscan, EState *estate, int eflags)
 {
 	CustomScanState *css;
 	Relation	scan_rel = NULL;
 	Index		scanrelid = cscan->scan.scanrelid;
 	Index		tlistvarno;
-
-        TS_EXECUTOR_FEATURES(CustomScan, cscan->scan.plan);
 
 	/*
 	 * Allocate the CustomScanState object.  We let the custom scan provider
@@ -105,6 +103,17 @@ ExecInitCustomScan(CustomScan *cscan, EState *estate, int eflags)
 	css->methods->BeginCustomScan(css, estate, eflags);
 
 	return css;
+}
+
+CustomScanState *ExecInitCustomScan(CustomScan *cscan, EState *estate, int eflags) {
+  CustomScanState *result;
+  result = WrappedExecInitCustomScan(cscan, estate, eflags);
+  if (tscout_executor_running) {
+    TS_MARKER(ExecCustomScan_features, (cscan->scan.plan).plan_node_id, estate->es_plannedstmt->queryId,
+              &(cscan->scan.plan), result, ChildPlanNodeId((cscan->scan.plan).lefttree),
+              ChildPlanNodeId((cscan->scan.plan).righttree), GetCurrentStatementStartTimestamp());
+  }
+  return result;
 }
 
 static pg_attribute_always_inline TupleTableSlot *

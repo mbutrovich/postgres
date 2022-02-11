@@ -161,13 +161,11 @@ TS_EXECUTOR_EXEC(Group)
  *	planner and initializes its outer subtree
  * -----------------
  */
-GroupState *
-ExecInitGroup(Group *node, EState *estate, int eflags)
+static pg_attribute_always_inline GroupState *
+WrappedExecInitGroup(Group *node, EState *estate, int eflags)
 {
 	GroupState *grpstate;
 	const TupleTableSlotOps *tts_ops;
-
-        TS_EXECUTOR_FEATURES(Group, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -222,6 +220,8 @@ ExecInitGroup(Group *node, EState *estate, int eflags)
 
 	return grpstate;
 }
+
+TS_EXECUTOR_INIT(Group, node->plan)
 
 /* ------------------------
  *		ExecEndGroup(node)

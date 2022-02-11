@@ -480,13 +480,11 @@ setop_retrieve_hash_table(SetOpState *setopstate)
  *		the node's subplan.
  * ----------------------------------------------------------------
  */
-SetOpState *
-ExecInitSetOp(SetOp *node, EState *estate, int eflags)
+static pg_attribute_always_inline SetOpState *
+WrappedExecInitSetOp(SetOp *node, EState *estate, int eflags)
 {
 	SetOpState *setopstate;
 	TupleDesc	outerDesc;
-
-        TS_EXECUTOR_FEATURES(SetOp, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -576,6 +574,8 @@ ExecInitSetOp(SetOp *node, EState *estate, int eflags)
 
 	return setopstate;
 }
+
+TS_EXECUTOR_INIT(SetOp, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndSetOp

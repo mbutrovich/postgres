@@ -33,9 +33,9 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
  * src/backend/executors/nodeBitmapAnd.c
  * src/backend/executors/nodeBitmapIndexscan.c
  * src/backend/executors/nodeBitmapOr.c
- * src/backend/executors/nodeSubplan.c
  * src/backend/executors/nodeHash.c
  * src/backend/executors/nodeHashjoin.c
+ * src/backend/executors/nodeSubplan.c
  */
 #define TS_EXECUTOR_EXEC(node_type)                                   \
   static TupleTableSlot *Exec##node_type(PlanState *pstate) {         \
@@ -51,6 +51,7 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
     return WrappedExec##node_type(pstate);                            \
   }
 
+// CustomScan is a jerk and named their node cscan instead, so I had to copy and paste this garbage there.
 #define TS_EXECUTOR_INIT(node_type, plan_node)                                                                       \
   node_type##State *ExecInit##node_type(node_type *node, EState *estate, int eflags) {                               \
     node_type##State *result;                                                                                        \

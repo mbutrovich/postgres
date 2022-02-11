@@ -128,12 +128,10 @@ TS_EXECUTOR_EXEC(WorkTableScan)
  *		ExecInitWorkTableScan
  * ----------------------------------------------------------------
  */
-WorkTableScanState *
-ExecInitWorkTableScan(WorkTableScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline WorkTableScanState *
+WrappedExecInitWorkTableScan(WorkTableScan *node, EState *estate, int eflags)
 {
 	WorkTableScanState *scanstate;
-
-        TS_EXECUTOR_FEATURES(WorkTableScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -184,6 +182,8 @@ ExecInitWorkTableScan(WorkTableScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(WorkTableScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndWorkTableScan

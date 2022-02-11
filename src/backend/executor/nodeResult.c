@@ -180,12 +180,10 @@ ExecResultRestrPos(ResultState *node)
  *		(child nodes).
  * ----------------------------------------------------------------
  */
-ResultState *
-ExecInitResult(Result *node, EState *estate, int eflags)
+static pg_attribute_always_inline ResultState *
+WrappedExecInitResult(Result *node, EState *estate, int eflags)
 {
 	ResultState *resstate;
-
-        TS_EXECUTOR_FEATURES(Result, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_MARK | EXEC_FLAG_BACKWARD)) ||
@@ -235,6 +233,8 @@ ExecInitResult(Result *node, EState *estate, int eflags)
 
 	return resstate;
 }
+
+TS_EXECUTOR_INIT(Result, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndResult

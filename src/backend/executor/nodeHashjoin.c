@@ -114,7 +114,6 @@
 #include "executor/nodeHashjoin.h"
 #include "miscadmin.h"
 #include "pgstat.h"
-#include "tscout/marker.h"
 #include "tscout/executors.h"
 #include "utils/memutils.h"
 #include "utils/sharedtuplestore.h"
@@ -627,8 +626,8 @@ ExecParallelHashJoin(PlanState *pstate)
  *		Init routine for HashJoin node.
  * ----------------------------------------------------------------
  */
-HashJoinState *
-ExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
+static pg_attribute_always_inline HashJoinState *
+WrappedExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
 {
 	HashJoinState *hjstate;
 	Plan	   *outerNode;
@@ -636,8 +635,6 @@ ExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
 	TupleDesc	outerDesc,
 				innerDesc;
 	const TupleTableSlotOps *ops;
-
-        TS_EXECUTOR_FEATURES(HashJoinImpl, node->join.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -770,6 +767,8 @@ ExecInitHashJoin(HashJoin *node, EState *estate, int eflags)
 
 	return hjstate;
 }
+
+TS_EXECUTOR_INIT(HashJoin, node->join.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndHashJoin

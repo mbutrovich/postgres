@@ -22,6 +22,7 @@
 #include "executor/nodeTidrangescan.h"
 #include "nodes/nodeFuncs.h"
 #include "storage/bufmgr.h"
+#include "tscout/executors.h"
 #include "utils/rel.h"
 
 
@@ -286,8 +287,8 @@ TidRangeRecheck(TidRangeScanState *node, TupleTableSlot *slot)
  *		  -- the relation indicated is opened for TID range scanning.
  * ----------------------------------------------------------------
  */
-static TupleTableSlot *
-ExecTidRangeScan(PlanState *pstate)
+static pg_attribute_always_inline TupleTableSlot *
+WrappedExecTidRangeScan(PlanState *pstate)
 {
 	TidRangeScanState *node = castNode(TidRangeScanState, pstate);
 
@@ -295,6 +296,8 @@ ExecTidRangeScan(PlanState *pstate)
 					(ExecScanAccessMtd) TidRangeNext,
 					(ExecScanRecheckMtd) TidRangeRecheck);
 }
+
+TS_EXECUTOR_EXEC(TidRangeScan)
 
 /* ----------------------------------------------------------------
  *		ExecReScanTidRangeScan(node)
@@ -324,6 +327,8 @@ ExecEndTidRangeScan(TidRangeScanState *node)
 {
 	TableScanDesc scan = node->ss.ss_currentScanDesc;
 
+        TS_EXECUTOR_FLUSH(IndexScan, node->ss.ps.plan);
+
 	if (scan != NULL)
 		table_endscan(scan);
 
@@ -351,8 +356,8 @@ ExecEndTidRangeScan(TidRangeScanState *node)
  *		  estate: the execution state initialized in InitPlan.
  * ----------------------------------------------------------------
  */
-TidRangeScanState *
-ExecInitTidRangeScan(TidRangeScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline TidRangeScanState *
+WrappedExecInitTidRangeScan(TidRangeScan *node, EState *estate, int eflags)
 {
 	TidRangeScanState *tidrangestate;
 	Relation	currentRelation;
@@ -411,3 +416,5 @@ ExecInitTidRangeScan(TidRangeScan *node, EState *estate, int eflags)
 	 */
 	return tidrangestate;
 }
+
+TS_EXECUTOR_INIT(TidRangeScan, node->scan.plan)

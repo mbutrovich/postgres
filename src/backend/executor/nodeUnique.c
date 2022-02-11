@@ -114,12 +114,10 @@ TS_EXECUTOR_EXEC(Unique)
  *		the node's subplan.
  * ----------------------------------------------------------------
  */
-UniqueState *
-ExecInitUnique(Unique *node, EState *estate, int eflags)
+static pg_attribute_always_inline UniqueState *
+WrappedExecInitUnique(Unique *node, EState *estate, int eflags)
 {
 	UniqueState *uniquestate;
-
-        TS_EXECUTOR_FEATURES(Unique, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -162,6 +160,8 @@ ExecInitUnique(Unique *node, EState *estate, int eflags)
 
 	return uniquestate;
 }
+
+TS_EXECUTOR_INIT(Unique, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndUnique

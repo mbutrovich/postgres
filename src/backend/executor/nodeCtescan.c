@@ -173,13 +173,11 @@ TS_EXECUTOR_EXEC(CteScan)
  *		ExecInitCteScan
  * ----------------------------------------------------------------
  */
-CteScanState *
-ExecInitCteScan(CteScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline CteScanState *
+WrappedExecInitCteScan(CteScan *node, EState *estate, int eflags)
 {
 	CteScanState *scanstate;
 	ParamExecData *prmdata;
-
-        TS_EXECUTOR_FEATURES(CteScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & EXEC_FLAG_MARK));
@@ -282,6 +280,8 @@ ExecInitCteScan(CteScan *node, EState *estate, int eflags)
 	return scanstate;
 }
 
+TS_EXECUTOR_INIT(CteScan, node->scan.plan)
+
 /* ----------------------------------------------------------------
  *		ExecEndCteScan
  *
@@ -291,7 +291,6 @@ ExecInitCteScan(CteScan *node, EState *estate, int eflags)
 void
 ExecEndCteScan(CteScanState *node)
 {
-
         TS_EXECUTOR_FLUSH(CteScan, node->ss.ps.plan);
 
 	/*

@@ -134,16 +134,14 @@ TS_EXECUTOR_EXEC(ForeignScan)
  *		ExecInitForeignScan
  * ----------------------------------------------------------------
  */
-ForeignScanState *
-ExecInitForeignScan(ForeignScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline ForeignScanState *
+WrappedExecInitForeignScan(ForeignScan *node, EState *estate, int eflags)
 {
 	ForeignScanState *scanstate;
 	Relation	currentRelation = NULL;
 	Index		scanrelid = node->scan.scanrelid;
 	Index		tlistvarno;
 	FdwRoutine *fdwroutine;
-
-        TS_EXECUTOR_FEATURES(ForeignScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -281,6 +279,8 @@ ExecInitForeignScan(ForeignScan *node, EState *estate, int eflags)
 
 	return scanstate;
 }
+
+TS_EXECUTOR_INIT(ForeignScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndForeignScan

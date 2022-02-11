@@ -494,15 +494,13 @@ ExecIndexOnlyRestrPos(IndexOnlyScanState *node)
  *			  index relation.
  * ----------------------------------------------------------------
  */
-IndexOnlyScanState *
-ExecInitIndexOnlyScan(IndexOnlyScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline IndexOnlyScanState *
+WrappedExecInitIndexOnlyScan(IndexOnlyScan *node, EState *estate, int eflags)
 {
 	IndexOnlyScanState *indexstate;
 	Relation	currentRelation;
 	LOCKMODE	lockmode;
 	TupleDesc	tupDesc;
-
-        TS_EXECUTOR_FEATURES(IndexOnlyScan, node->scan.plan);
 
 	/*
 	 * create state structure
@@ -636,6 +634,8 @@ ExecInitIndexOnlyScan(IndexOnlyScan *node, EState *estate, int eflags)
 	 */
 	return indexstate;
 }
+
+TS_EXECUTOR_INIT(IndexOnlyScan, node->scan.plan)
 
 /* ----------------------------------------------------------------
  *		Parallel Index-only Scan Support

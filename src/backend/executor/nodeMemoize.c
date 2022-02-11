@@ -820,16 +820,14 @@ WrappedExecMemoize(PlanState *pstate)
 
 TS_EXECUTOR_EXEC(Memoize)
 
-MemoizeState *
-ExecInitMemoize(Memoize *node, EState *estate, int eflags)
+static pg_attribute_always_inline MemoizeState *
+WrappedExecInitMemoize(Memoize *node, EState *estate, int eflags)
 {
 	MemoizeState *mstate = makeNode(MemoizeState);
 	Plan	   *outerNode;
 	int			i;
 	int			nkeys;
 	Oid		   *eqfuncoids;
-
-        TS_EXECUTOR_FEATURES(Memoize, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -939,6 +937,8 @@ ExecInitMemoize(Memoize *node, EState *estate, int eflags)
 
 	return mstate;
 }
+
+TS_EXECUTOR_INIT(Memoize, node->plan)
 
 void
 ExecEndMemoize(MemoizeState *node)

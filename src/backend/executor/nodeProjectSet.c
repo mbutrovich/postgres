@@ -219,14 +219,12 @@ ExecProjectSRF(ProjectSetState *node, bool continuing)
  *		(child nodes).
  * ----------------------------------------------------------------
  */
-ProjectSetState *
-ExecInitProjectSet(ProjectSet *node, EState *estate, int eflags)
+static pg_attribute_always_inline ProjectSetState *
+WrappedExecInitProjectSet(ProjectSet *node, EState *estate, int eflags)
 {
 	ProjectSetState *state;
 	ListCell   *lc;
 	int			off;
-
-        TS_EXECUTOR_FEATURES(ProjectSet, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_MARK | EXEC_FLAG_BACKWARD)));
@@ -315,6 +313,8 @@ ExecInitProjectSet(ProjectSet *node, EState *estate, int eflags)
 
 	return state;
 }
+
+TS_EXECUTOR_INIT(ProjectSet, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndProjectSet

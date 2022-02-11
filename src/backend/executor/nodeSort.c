@@ -166,12 +166,10 @@ TS_EXECUTOR_EXEC(Sort)
  *		produced by the planner and initializes its outer subtree.
  * ----------------------------------------------------------------
  */
-SortState *
-ExecInitSort(Sort *node, EState *estate, int eflags)
+static pg_attribute_always_inline SortState *
+WrappedExecInitSort(Sort *node, EState *estate, int eflags)
 {
 	SortState  *sortstate;
-
-        TS_EXECUTOR_FEATURES(Sort, node->plan);
 
 	SO1_printf("ExecInitSort: %s\n",
 			   "initializing sort node");
@@ -231,6 +229,8 @@ ExecInitSort(Sort *node, EState *estate, int eflags)
 
 	return sortstate;
 }
+
+TS_EXECUTOR_INIT(Sort, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndSort(node)

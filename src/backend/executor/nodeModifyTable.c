@@ -2707,8 +2707,8 @@ ExecLookupResultRelByOid(ModifyTableState *node, Oid resultoid,
  *		ExecInitModifyTable
  * ----------------------------------------------------------------
  */
-ModifyTableState *
-ExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
+static pg_attribute_always_inline ModifyTableState *
+WrappedExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
 {
 	ModifyTableState *mtstate;
 	Plan	   *subplan = outerPlan(node);
@@ -2719,8 +2719,6 @@ ExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
 	ListCell   *l;
 	int			i;
 	Relation	rel;
-
-        TS_EXECUTOR_FEATURES(ModifyTable, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -3161,6 +3159,8 @@ ExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
 
 	return mtstate;
 }
+
+TS_EXECUTOR_INIT(ModifyTable, node->plan)
 
 /* ----------------------------------------------------------------
  *		ExecEndModifyTable

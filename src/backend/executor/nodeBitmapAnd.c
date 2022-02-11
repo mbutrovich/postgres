@@ -52,8 +52,8 @@ ExecBitmapAnd(PlanState *pstate)
  *		Begin all of the subscans of the BitmapAnd node.
  * ----------------------------------------------------------------
  */
-BitmapAndState *
-ExecInitBitmapAnd(BitmapAnd *node, EState *estate, int eflags)
+static pg_attribute_always_inline BitmapAndState *
+WrappedExecInitBitmapAnd(BitmapAnd *node, EState *estate, int eflags)
 {
 	BitmapAndState *bitmapandstate = makeNode(BitmapAndState);
 	PlanState **bitmapplanstates;
@@ -61,8 +61,6 @@ ExecInitBitmapAnd(BitmapAnd *node, EState *estate, int eflags)
 	int			i;
 	ListCell   *l;
 	Plan	   *initNode;
-
-        TS_EXECUTOR_FEATURES(BitmapAnd, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -104,6 +102,8 @@ ExecInitBitmapAnd(BitmapAnd *node, EState *estate, int eflags)
 
 	return bitmapandstate;
 }
+
+TS_EXECUTOR_INIT(BitmapAnd, node->plan)
 
 /* ----------------------------------------------------------------
  *	   MultiExecBitmapAnd

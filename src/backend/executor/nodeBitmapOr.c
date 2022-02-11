@@ -53,8 +53,8 @@ ExecBitmapOr(PlanState *pstate)
  *		Begin all of the subscans of the BitmapOr node.
  * ----------------------------------------------------------------
  */
-BitmapOrState *
-ExecInitBitmapOr(BitmapOr *node, EState *estate, int eflags)
+static pg_attribute_always_inline BitmapOrState *
+WrappedExecInitBitmapOr(BitmapOr *node, EState *estate, int eflags)
 {
 	BitmapOrState *bitmaporstate = makeNode(BitmapOrState);
 	PlanState **bitmapplanstates;
@@ -62,8 +62,6 @@ ExecInitBitmapOr(BitmapOr *node, EState *estate, int eflags)
 	int			i;
 	ListCell   *l;
 	Plan	   *initNode;
-
-        TS_EXECUTOR_FEATURES(BitmapOr, node->plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -105,6 +103,8 @@ ExecInitBitmapOr(BitmapOr *node, EState *estate, int eflags)
 
 	return bitmaporstate;
 }
+
+TS_EXECUTOR_INIT(BitmapOr, node->plan)
 
 /* ----------------------------------------------------------------
  *	   MultiExecBitmapOr

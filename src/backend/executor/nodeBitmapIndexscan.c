@@ -224,13 +224,11 @@ ExecEndBitmapIndexScan(BitmapIndexScanState *node)
  *		Initializes the index scan's state information.
  * ----------------------------------------------------------------
  */
-BitmapIndexScanState *
-ExecInitBitmapIndexScan(BitmapIndexScan *node, EState *estate, int eflags)
+static pg_attribute_always_inline BitmapIndexScanState *
+WrappedExecInitBitmapIndexScan(BitmapIndexScan *node, EState *estate, int eflags)
 {
 	BitmapIndexScanState *indexstate;
 	LOCKMODE	lockmode;
-
-        TS_EXECUTOR_FEATURES(BitmapIndexScan, node->scan.plan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));
@@ -347,3 +345,5 @@ ExecInitBitmapIndexScan(BitmapIndexScan *node, EState *estate, int eflags)
 	 */
 	return indexstate;
 }
+
+TS_EXECUTOR_INIT(BitmapIndexScan, node->scan.plan)

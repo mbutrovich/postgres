@@ -245,7 +245,7 @@ def collector(collector_flags, ou_processor_queues, pid, worker_type, socket_fd)
     # Open an output buffer for this OU. ou_indexes was generated from a filter on worker_type, so it should only
     # contain indexes that are valid for this worker.
     for i in ou_indexes:
-        output_buffer = f'collector_results_{i}'
+        output_buffer = f"collector_results_{i}"
         collector_bpf[output_buffer].open_perf_buffer(
             callback=collector_event_builder(output_buffer), lost_cb=lost_collector_event
         )

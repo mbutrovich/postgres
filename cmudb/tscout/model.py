@@ -9,7 +9,7 @@ import logging
 import struct
 import sys
 from dataclasses import dataclass
-from enum import Enum, unique, IntEnum
+from enum import Enum, IntEnum, unique
 from typing import List, Mapping, Tuple
 
 import clang.cindex

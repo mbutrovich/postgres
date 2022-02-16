@@ -19,8 +19,10 @@ logger = logging.getLogger("tscout")
 # Path to the Postgres root.
 POSTGRES_PATH = Path(__file__).parent.parent.parent
 # Path to the Postgres files to parse.
-POSTGRES_FILES = (f"{POSTGRES_PATH}/src/backend/executor/execMain.c",
-                  f"{POSTGRES_PATH}/src/backend/catalog/index.c",)
+POSTGRES_FILES = (
+    f"{POSTGRES_PATH}/src/backend/executor/execMain.c",
+    f"{POSTGRES_PATH}/src/backend/catalog/index.c",
+)
 # The arguments that Clang uses to parse header files.
 CLANG_ARGS = [
     "-std=c17",

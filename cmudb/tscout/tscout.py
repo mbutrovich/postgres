@@ -2,11 +2,16 @@
 import argparse
 import logging
 import multiprocessing as mp
+import re
 import sys
+import time
 from dataclasses import dataclass
+from distutils import util
+from enum import Enum, auto, unique
 
 import model
 import psutil
+import psycopg
 import setproctitle
 from bcc import (  # pylint: disable=no-name-in-module
     BPF,
@@ -15,6 +20,7 @@ from bcc import (  # pylint: disable=no-name-in-module
     PerfType,
     utils,
 )
+from psycopg.rows import dict_row
 
 
 @dataclass
@@ -222,23 +228,6 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     collector_bpf["cache_misses"].open_perf_event(PerfType.HARDWARE, PerfHWConfig.CACHE_MISSES)
     collector_bpf["ref_cpu_cycles"].open_perf_event(PerfType.HARDWARE, PerfHWConfig.REF_CPU_CYCLES)
 
-    heavy_hitter_ou_index = -1
-    heavy_hitter_counter = 0
-
-    def heavy_hitter_update(ou_index):
-        # heavy_hitter_update pylint: disable=unused-variable
-        nonlocal heavy_hitter_counter
-        nonlocal heavy_hitter_ou_index
-
-        if heavy_hitter_counter == 0:
-            heavy_hitter_ou_index = ou_index
-            heavy_hitter_counter = 1
-        else:
-            if heavy_hitter_ou_index == ou_index:
-                heavy_hitter_counter = heavy_hitter_counter + 1
-            else:
-                heavy_hitter_counter = heavy_hitter_counter - 1
-
     lost_collector_events = 0
 
     def lost_collector_event(num_lost):
@@ -257,7 +246,6 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
                 [event_features, ",", ",".join(metric.serialize(raw_data) for metric in metrics), "\n"]
             )
             ou_processor_queues[raw_data.ou_index].put(training_data)  # TODO(Matt): maybe put_nowait?
-            # heavy_hitter_update(raw_data.ou_index)
 
         return collector_event
 
@@ -289,6 +277,144 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
 def lost_something(num_lost):
     # num_lost. pylint: disable=unused-argument
     pass
+
+
+def settings_collector(shutdown):
+    @unique
+    class SettingType(Enum):
+        BOOLEAN = auto()
+        INTEGER = auto()
+        BYTES = auto()
+        INTEGER_TIME = auto()
+        FLOAT_TIME = auto()
+        FLOAT = auto()
+        ENUM = auto()
+
+    def _time_unit_to_ms(str):
+        if str == "d":
+            return 1000 * 60 * 60 * 24
+        elif str == "h":
+            return 1000 * 60 * 60
+        elif str == "min":
+            return 1000 * 60
+        elif str == "s":
+            return 1000
+        elif str == "ms":
+            return 1
+        elif str == "us":
+            return 1.0 / 1000
+        else:
+            return None
+
+    def _parse_field(type, value):
+        if type == SettingType.BOOLEAN:
+            return util.strtobool(value)
+        elif type == SettingType.INTEGER:
+            return int(value)
+        elif type == SettingType.BYTES:
+            if value in ["-1", "0"]:
+                # Hardcoded default/disabled values for this field.
+                return int(value)
+            bytes_regex = re.compile(r"(\d+)\s*([kmgtp]?b)", re.IGNORECASE)
+            order = ("b", "kb", "mb", "gb", "tb", "pb")
+            field_bytes = None
+            for number, unit in bytes_regex.findall(value):
+                field_bytes = int(number) * (1024 ** order.index(unit.lower()))
+            assert field_bytes is not None, f"Failed to parse bytes from value string {value}"
+            return field_bytes
+        elif type == SettingType.INTEGER_TIME:
+            if value == "-1":
+                # Hardcoded default/disabled values for this field.
+                return int(value)
+            bytes_regex = re.compile(r"(\d+)\s*((?:d|h|min|s|ms|us)?)", re.IGNORECASE)
+            field_ms = None
+            for number, unit in bytes_regex.findall(value):
+                field_ms = int(number) * _time_unit_to_ms(unit)
+            assert field_ms is not None, f"Failed to parse time from value string {value}"
+            return field_ms
+        elif type == SettingType.FLOAT_TIME:
+            if value == "0":
+                # Hardcoded default/disabled values for this field.
+                return int(value)
+            bytes_regex = re.compile(r"(\d+(?:\.\d+)?)\s*((?:d|h|min|s|ms|us)?)", re.IGNORECASE)
+            field_ms = None
+            for number, unit in bytes_regex.findall(value):
+                field_ms = float(number) * _time_unit_to_ms(unit)
+            assert field_ms is not None, f"Failed to parse time from value string {value}"
+            return field_ms
+        elif type == SettingType.FLOAT:
+            return float(value)
+        else:
+            return None
+
+    def scrape(connection, rows):
+        result = {}
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute("SHOW ALL;")
+            for record in cursor:
+                setting_name = record["name"]
+                if setting_name in rows:
+                    setting_type = rows[setting_name]
+                    setting_str = record["setting"]
+                    result[setting_name] = _parse_field(setting_type, setting_str)
+
+        connection.commit()
+        return result
+
+    resource_knobs = {
+        "shared_buffers": SettingType.BYTES,
+        # 'huge_pages': SettingType.ENUM,
+        "huge_page_size": SettingType.BYTES,
+        "temp_buffers": SettingType.BYTES,
+        "max_prepared_transactions": SettingType.INTEGER,
+        "work_mem": SettingType.BYTES,
+        "hash_mem_multiplier": SettingType.FLOAT,
+        "maintenance_work_mem": SettingType.BYTES,
+        "autovacuum_work_mem": SettingType.BYTES,
+        "logical_decoding_work_mem": SettingType.BYTES,
+        "max_stack_depth": SettingType.BYTES,
+        # 'shared_memory_type': SettingType.ENUM,
+        # 'dynamic_shared_memory_type':SettingType.ENUM,
+        "min_dynamic_shared_memory": SettingType.BYTES,
+        "temp_file_limit": SettingType.INTEGER,
+        "max_files_per_process": SettingType.INTEGER,
+        "vacuum_cost_delay": SettingType.FLOAT_TIME,
+        "vacuum_cost_page_hit": SettingType.INTEGER,
+        "vacuum_cost_page_miss": SettingType.INTEGER,
+        "vacuum_cost_page_dirty": SettingType.INTEGER,
+        "vacuum_cost_limit": SettingType.INTEGER,
+        "bgwriter_delay": SettingType.INTEGER_TIME,
+        "bgwriter_lru_maxpages": SettingType.INTEGER,
+        "bgwriter_lru_multiplier": SettingType.FLOAT,
+        "bgwriter_flush_after": SettingType.BYTES,
+        "backend_flush_after": SettingType.BYTES,
+        "effective_io_concurrency": SettingType.INTEGER,
+        "maintenance_io_concurrency": SettingType.INTEGER,
+        "max_worker_processes": SettingType.INTEGER,
+        "max_parallel_workers_per_gather": SettingType.INTEGER,
+        "max_parallel_maintenance_workers": SettingType.INTEGER,
+        "max_parallel_workers": SettingType.INTEGER,
+        "parallel_leader_participation": SettingType.BOOLEAN,
+        "old_snapshot_threshold": SettingType.INTEGER_TIME,
+    }
+
+    setproctitle.setproctitle("TScout Userspace Collector")
+
+    with psycopg.connect("host=localhost port=5432 dbname=test user=matt", autocommit=True) as connection:
+        # Poll on the Collector's output buffer until Collector is shut down.
+        while not shutdown.is_set():
+            try:
+                results = scrape(connection, resource_knobs)
+                for setting_name, setting_value in results.items():
+                    print(setting_name, setting_value)
+                # print("hi.")
+                time.sleep(1)
+            except KeyboardInterrupt:
+                logger.info("Userspace Collector caught KeyboardInterrupt.")
+            except Exception as e:  # pylint: disable=broad-except
+                logger.warning("Userspace Collector caught %s.", e)
+
+    logger.info("Userspace Collector shut down.")
 
 
 def processor(ou, buffered_strings, outdir):
@@ -378,6 +504,10 @@ def main():
             ou_processor.start()
             ou_processors.append(ou_processor)
 
+        shutdown = manager.Event()
+        userspace_collector_process = mp.Process(target=settings_collector, args=(shutdown,))
+        userspace_collector_process.start()
+
         def create_collector(child_pid, socket_fd=None):
             logger.info("Postmaster forked PID %s, creating its Collector.", child_pid)
             collector_flags[child_pid] = True
@@ -427,6 +557,8 @@ def main():
 
         # Shut down the Collectors so that
         # no more data is generated for the Processors.
+        shutdown.set()
+        userspace_collector_process.join()
         for pid, process in collector_processes.items():
             collector_flags[pid] = False
             process.join()

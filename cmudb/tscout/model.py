@@ -257,12 +257,12 @@ class WorkerType(IntEnum):
 
 # An OU is specified via (operator, postgres_function, feature_types):
 #
-# operator : str
-#   The name of the PostgreSQL operator.
 # postgres_function : str
 #   The name of the PostgreSQL function generating the features marker.
 # feature_types : List[Feature]
 #   A list of the features being emitted by PostgreSQL. If modified, you must change the markers in PostgreSQL source.
+# worker_types : Tuple(WorkerType)
+#   A list of the WorkerTypes that use this OU. Only listed workers will get the BPF C code generated for the Collector.
 OU_DEFS = [
     ("ExecAgg",
      [

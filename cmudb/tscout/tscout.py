@@ -347,7 +347,7 @@ def settings_collector(shutdown):
         else:
             return None
 
-    def scrape(connection, rows):
+    def scrape_settings(connection, rows):
         result = {}
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute("SHOW ALL;")
@@ -361,41 +361,50 @@ def settings_collector(shutdown):
         connection.commit()
         return result
 
-    resource_knobs = {
-        "shared_buffers": SettingType.BYTES,
-        # 'huge_pages': SettingType.ENUM,
-        "huge_page_size": SettingType.BYTES,
-        "temp_buffers": SettingType.BYTES,
-        "max_prepared_transactions": SettingType.INTEGER,
-        "work_mem": SettingType.BYTES,
-        "hash_mem_multiplier": SettingType.FLOAT,
+    def scrape_table(connection, query):
+        # Open a cursor to perform database operations
+        tuples = []
+        columns = []
+        with connection.cursor() as cursor:
+            # Query the database and obtain data as Python objects.
+            cursor.execute(query)
+            for column in cursor.description:
+                columns.append(column.name)
+            for record in cursor:
+                tuples.append(record)
+
+        connection.commit()
+        return columns, tuples
+
+    autovac_knobs = {
+        # https://www.postgresql.org/docs/current/runtime-config-autovacuum.html
+        "autovacuum": SettingType.BOOLEAN,
+        "autovacuum_max_workers": SettingType.INTEGER,
+        "autovacuum_naptime": SettingType.INTEGER_TIME,
+        "autovacuum_vacuum_threshold": SettingType.INTEGER,
+        "autovacuum_vacuum_insert_threshold": SettingType.INTEGER,
+        "autovacuum_analyze_threshold": SettingType.INTEGER,
+        "autovacuum_vacuum_scale_factor": SettingType.FLOAT,
+        "autovacuum_vacuum_insert_scale_factor": SettingType.FLOAT,
+        "autovacuum_analyze_scale_factor": SettingType.FLOAT,
+        "autovacuum_freeze_max_age": SettingType.INTEGER,
+        "autovacuum_multixact_freeze_max_age": SettingType.INTEGER,
+        "autovacuum_vacuum_cost_delay": SettingType.FLOAT_TIME,
+        "autovacuum_vacuum_cost_limit": SettingType.INTEGER,
+        # https://www.postgresql.org/docs/12/runtime-config-resource.html
         "maintenance_work_mem": SettingType.BYTES,
         "autovacuum_work_mem": SettingType.BYTES,
-        "logical_decoding_work_mem": SettingType.BYTES,
-        "max_stack_depth": SettingType.BYTES,
-        # 'shared_memory_type': SettingType.ENUM,
-        # 'dynamic_shared_memory_type':SettingType.ENUM,
-        "min_dynamic_shared_memory": SettingType.BYTES,
-        "temp_file_limit": SettingType.INTEGER,
-        "max_files_per_process": SettingType.INTEGER,
         "vacuum_cost_delay": SettingType.FLOAT_TIME,
         "vacuum_cost_page_hit": SettingType.INTEGER,
         "vacuum_cost_page_miss": SettingType.INTEGER,
         "vacuum_cost_page_dirty": SettingType.INTEGER,
         "vacuum_cost_limit": SettingType.INTEGER,
-        "bgwriter_delay": SettingType.INTEGER_TIME,
-        "bgwriter_lru_maxpages": SettingType.INTEGER,
-        "bgwriter_lru_multiplier": SettingType.FLOAT,
-        "bgwriter_flush_after": SettingType.BYTES,
-        "backend_flush_after": SettingType.BYTES,
         "effective_io_concurrency": SettingType.INTEGER,
         "maintenance_io_concurrency": SettingType.INTEGER,
         "max_worker_processes": SettingType.INTEGER,
         "max_parallel_workers_per_gather": SettingType.INTEGER,
         "max_parallel_maintenance_workers": SettingType.INTEGER,
         "max_parallel_workers": SettingType.INTEGER,
-        "parallel_leader_participation": SettingType.BOOLEAN,
-        "old_snapshot_threshold": SettingType.INTEGER_TIME,
     }
 
     setproctitle.setproctitle("TScout Userspace Collector")
@@ -404,9 +413,15 @@ def settings_collector(shutdown):
         # Poll on the Collector's output buffer until Collector is shut down.
         while not shutdown.is_set():
             try:
-                results = scrape(connection, resource_knobs)
-                for setting_name, setting_value in results.items():
-                    print(setting_name, setting_value)
+                # results = scrape_settings(connection, autovac_knobs)
+                # for setting_name, setting_value in results.items():
+                #     print(setting_name, setting_value)
+                columns, tuples = scrape_table(
+                    connection,
+                    "SELECT relid, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum FROM pg_stat_user_tables;",
+                )
+                print(columns)
+                print(tuples)
                 # print("hi.")
                 time.sleep(1)
             except KeyboardInterrupt:
@@ -417,7 +432,7 @@ def settings_collector(shutdown):
     logger.info("Userspace Collector shut down.")
 
 
-def processor(ou, buffered_strings, outdir):
+def processor(ou, buffered_strings, outdir, table_stats):
     setproctitle.setproctitle(f"TScout Processor {ou.name()}")
 
     # Open output file, with the name based on the OU.
@@ -488,6 +503,8 @@ def main():
         collector_flags = manager.dict()
         collector_processes = {}
 
+        table_stats = manager.dict()
+
         ou_processor_queues = []
         ou_processors = []
 
@@ -499,7 +516,7 @@ def main():
             ou_processor_queues.append(ou_processor_queue)
             ou_processor = mp.Process(
                 target=processor,
-                args=(ou, ou_processor_queue, outdir),
+                args=(ou, ou_processor_queue, outdir, table_stats),
             )
             ou_processor.start()
             ou_processors.append(ou_processor)
@@ -507,6 +524,8 @@ def main():
         shutdown = manager.Event()
         userspace_collector_process = mp.Process(target=settings_collector, args=(shutdown,))
         userspace_collector_process.start()
+
+        time.sleep(5)
 
         def create_collector(child_pid, socket_fd=None):
             logger.info("Postmaster forked PID %s, creating its Collector.", child_pid)
@@ -559,8 +578,9 @@ def main():
         # no more data is generated for the Processors.
         shutdown.set()
         userspace_collector_process.join()
-        for pid, process in collector_processes.items():
+        for pid, _ in collector_processes.items():
             collector_flags[pid] = False
+        for _, process in collector_processes.items():
             process.join()
             logger.info("Joined Collector for PID %s.", pid)
         print("TScout joined all Collectors.")
@@ -570,6 +590,7 @@ def main():
         for ou_processor_queue in ou_processor_queues:
             ou_processor_queue.put(None)
             ou_processor_queue.close()
+        for ou_processor_queue in ou_processor_queues:
             ou_processor_queue.join_thread()
         print("TScout joined all Processor queues.")
 

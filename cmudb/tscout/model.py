@@ -230,9 +230,13 @@ class Reagent:
 # fields will have their structs unrolled). The value is the Reagent. See the documentation for the Reagent class for
 # more details about its fields.
 REAGENTS = {
-    'List *': Reagent(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_reagent="""
+    "List *": Reagent(type_name='List', return_type=clang.cindex.TypeKind.LONG, c_reagent="""
   s32 produced = 0;
-  bpf_probe_read(&produced, sizeof(s32), &(cast_ptr->List_length));
+  if (cast_ptr != NULL) bpf_probe_read(&produced, sizeof(s32), &(cast_ptr->List_length));
+"""),
+    "struct Plan *": Reagent(type_name='Plan', return_type=clang.cindex.TypeKind.LONG, c_reagent="""
+  s32 produced = -1;
+  if (cast_ptr != NULL) bpf_probe_read(&produced, sizeof(s32), &(cast_ptr->Plan_plan_node_id));
 """)
 }
 

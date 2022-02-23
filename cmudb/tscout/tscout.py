@@ -280,7 +280,10 @@ def lost_something(num_lost):
     pass
 
 
-def settings_collector(shutdown):
+table_stats_query = "SELECT relid,n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum FROM pg_stat_user_tables;"
+
+
+def settings_collector(table_stats, shutdown):
     @unique
     class SettingType(Enum):
         BOOLEAN = auto()
@@ -414,16 +417,16 @@ def settings_collector(shutdown):
         # Poll on the Collector's output buffer until Collector is shut down.
         while not shutdown.is_set():
             try:
+                # print(table_stats_columns)
+                # print(table_stats)
                 # results = scrape_settings(connection, autovac_knobs)
                 # for setting_name, setting_value in results.items():
                 #     print(setting_name, setting_value)
-                columns, tuples = scrape_table(
-                    connection,
-                    "SELECT relid, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum FROM pg_stat_user_tables;",
-                )
-                print(columns)
-                print(tuples)
-                # print("hi.")
+                _, tuples = scrape_table(connection, table_stats_query)
+                # table_stats_columns = ",".join(str(val) for val in columns[1:])
+                for row in tuples:
+                    table_id = str(row[0])
+                    table_stats[table_id] = ",".join(str(val) for val in row[1:])
                 time.sleep(1)
             except KeyboardInterrupt:
                 logger.info("Userspace Collector caught KeyboardInterrupt.")
@@ -433,7 +436,7 @@ def settings_collector(shutdown):
     logger.info("Userspace Collector shut down.")
 
 
-def processor(ou, buffered_strings, outdir, append):
+def processor(ou, buffered_strings, table_stats, outdir, append):
     setproctitle.setproctitle(f"TScout Processor {ou.name()}")
 
     file_path = f"{outdir}/{ou.name()}.csv"
@@ -447,6 +450,10 @@ def processor(ou, buffered_strings, outdir, append):
     # Open output file, with the name based on the OU.
     with open(file_path, mode=file_mode, encoding="utf-8") as file:
         if file_mode == "w":
+            if ou.name() == "ExecModifyTable":
+                file.write(
+                    "n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum,"
+                )
             # Write the OU's feature columns for CSV header,
             # with an additional separator before resource metrics columns.
             file.write(ou.features_columns() + ",")
@@ -460,7 +467,10 @@ def processor(ou, buffered_strings, outdir, append):
             # Write serialized training data points from shared queue to file.
             while True:
                 string = buffered_strings.get()
-                file.write(string)
+                if ou.name() == "ExecModifyTable":
+                    file.write(table_stats["16385"] + string)
+                else:
+                    file.write(string)
 
         except KeyboardInterrupt:
             logger.info("Processor for %s caught KeyboardInterrupt.", ou.name())
@@ -522,6 +532,8 @@ def main():
         ou_processor_queues = []
         ou_processors = []
 
+        table_stats = manager.dict()
+
         # Create a Processor for each OU
         for ou in operating_units:
             # TODO(Matt): maybe bound this queue size?
@@ -530,13 +542,19 @@ def main():
             ou_processor_queues.append(ou_processor_queue)
             ou_processor = mp.Process(
                 target=processor,
-                args=(ou, ou_processor_queue, outdir, append),
+                args=(ou, ou_processor_queue, table_stats, outdir, append),
             )
             ou_processor.start()
             ou_processors.append(ou_processor)
 
         shutdown = manager.Event()
-        userspace_collector_process = mp.Process(target=settings_collector, args=(shutdown,))
+        userspace_collector_process = mp.Process(
+            target=settings_collector,
+            args=(
+                table_stats,
+                shutdown,
+            ),
+        )
         userspace_collector_process.start()
 
         time.sleep(5)

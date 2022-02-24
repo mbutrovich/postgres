@@ -230,7 +230,7 @@ ExecInitBitmapIndexScan(BitmapIndexScan *node, EState *estate, int eflags)
 	BitmapIndexScanState *indexstate;
 	LOCKMODE	lockmode;
 
-        TS_EXECUTOR_FEATURES(BitmapIndexScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(BitmapIndexScan, node->scan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));

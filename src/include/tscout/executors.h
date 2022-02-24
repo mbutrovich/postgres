@@ -1,8 +1,10 @@
 #pragma once
 
-#include "access/xact.h"
+#include "access/xact.h"        // GetCurrentStatementStartTimestamp
+#include "executor/executor.h"  // ExecGetRangeTableRelation
 #include "tscout/marker.h"
 #include "tscout/sampling.h"
+#include "utils/rel.h"  // RelationData
 
 // TODO(Matt): Consider a BPF-level Encoder for this as a proof of concept.
 static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
@@ -14,6 +16,14 @@ static int ChildPlanNodeId(const struct Plan *const child_plan_node) {
     TS_MARKER(Exec##node_type##_features, (plan_node).plan_node_id, estate->es_plannedstmt->queryId, &(plan_node), \
               ChildPlanNodeId((plan_node).lefttree), ChildPlanNodeId((plan_node).righttree),                       \
               GetCurrentStatementStartTimestamp());                                                                \
+  }
+
+#define TS_EXECUTOR_SCAN_FEATURES(node_type, scan_node)                                                              \
+  if (tscout_executor_running) {                                                                                     \
+    Plan *plan_node = &((scan_node).plan);                                                                           \
+    TS_MARKER(Exec##node_type##_features, plan_node->plan_node_id, estate->es_plannedstmt->queryId, plan_node,       \
+              ChildPlanNodeId(plan_node->lefttree), ChildPlanNodeId(plan_node->righttree),                           \
+              GetCurrentStatementStartTimestamp(), ExecGetRangeTableRelation(estate, (scan_node).scanrelid)->rd_id); \
   }
 
 #define TS_EXECUTOR_FLUSH(node_type, plan_node)                    \

@@ -126,7 +126,7 @@ ExecInitSeqScan(SeqScan *node, EState *estate, int eflags)
 {
 	SeqScanState *scanstate;
 
-        TS_EXECUTOR_FEATURES(SeqScan, node->plan);
+        TS_EXECUTOR_SCAN_FEATURES(SeqScan, *node);
 
 	/*
 	 * Once upon a time it was possible to have an outerPlan of a SeqScan, but

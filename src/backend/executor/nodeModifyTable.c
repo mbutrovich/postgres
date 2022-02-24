@@ -2720,7 +2720,12 @@ ExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
 	int			i;
 	Relation	rel;
 
-        TS_EXECUTOR_FEATURES(ModifyTable, node->plan);
+        if (tscout_executor_running) {
+          TS_MARKER(ExecModifyTable_features, (node->plan).plan_node_id, estate->es_plannedstmt->queryId, &(node->plan),
+                    ChildPlanNodeId((node->plan).lefttree), ChildPlanNodeId((node->plan).righttree),
+                    GetCurrentStatementStartTimestamp(),
+                    ExecGetRangeTableRelation(estate, node->nominalRelation)->rd_id);
+        }
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));

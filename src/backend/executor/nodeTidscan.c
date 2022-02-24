@@ -505,7 +505,7 @@ ExecInitTidScan(TidScan *node, EState *estate, int eflags)
 	TidScanState *tidstate;
 	Relation	currentRelation;
         
-        TS_EXECUTOR_FEATURES(TidScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(TidScan, node->scan);
 
 	/*
 	 * create state structure

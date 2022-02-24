@@ -362,7 +362,7 @@ ExecInitTidRangeScan(TidRangeScan *node, EState *estate, int eflags)
 	TidRangeScanState *tidrangestate;
 	Relation	currentRelation;
 
-        TS_EXECUTOR_FEATURES(TidRangeScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(TidRangeScan, node->scan);
 
 	/*
 	 * create state structure

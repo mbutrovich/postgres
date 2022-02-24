@@ -57,12 +57,8 @@ class BPFVariable:
         Some variables should not be output, e.g., pointers,
         as the values do not make sense from a ML perspective.
         """
-        suppressed = [
-            clang.cindex.TypeKind.POINTER,
-            clang.cindex.TypeKind.FUNCTIONPROTO,
-            clang.cindex.TypeKind.INCOMPLETEARRAY,
-            clang.cindex.TypeKind.CONSTANTARRAY,
-        ]
+        suppressed = {clang.cindex.TypeKind.POINTER, clang.cindex.TypeKind.FUNCTIONPROTO,
+                      clang.cindex.TypeKind.INCOMPLETEARRAY, clang.cindex.TypeKind.CONSTANTARRAY}
         return self.c_type not in suppressed
 
     def serialize(self, output_event):
@@ -240,6 +236,8 @@ REAGENTS = {
 # query_id as BIGINT so TScout stores it as int64 to match this representation.
 QUERY_ID = Feature("QueryId", readarg_p=False,
                    bpf_tuple=(BPFVariable(name="query_id", c_type=clang.cindex.TypeKind.LONG),))
+TARGET_TABLE_OID = Feature("target_table_oid", readarg_p=False,
+                           bpf_tuple=(BPFVariable(name="target_table_oid", c_type=clang.cindex.TypeKind.INT),))
 LEFT_CHILD_NODE_ID = Feature("left_child_plan_node_id", readarg_p=False,
                              bpf_tuple=(BPFVariable(name="left_child_plan_node_id", c_type=clang.cindex.TypeKind.INT),))
 RIGHT_CHILD_NODE_ID = Feature("right_child_plan_node_id", readarg_p=False,
@@ -290,7 +288,8 @@ OU_DEFS = [
          Feature("BitmapHeapScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecBitmapIndexScan",
      [
@@ -298,7 +297,8 @@ OU_DEFS = [
          Feature("BitmapIndexScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecBitmapOr",
      [
@@ -394,7 +394,8 @@ OU_DEFS = [
          Feature("IndexOnlyScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecIndexScan",
      [
@@ -402,7 +403,8 @@ OU_DEFS = [
          Feature("IndexScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecLimit",
      [
@@ -458,7 +460,8 @@ OU_DEFS = [
          Feature("ModifyTable"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecNamedTuplestoreScan",
      [
@@ -506,7 +509,8 @@ OU_DEFS = [
          Feature("SampleScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecSeqScan",
      [
@@ -514,7 +518,8 @@ OU_DEFS = [
          Feature("Scan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecSetOp",
      [
@@ -562,7 +567,8 @@ OU_DEFS = [
          Feature("TidRangeScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecTidScan",
      [
@@ -570,7 +576,8 @@ OU_DEFS = [
          Feature("TidScan"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP
+         STATEMENT_TIMESTAMP,
+         TARGET_TABLE_OID
      ]),
     ("ExecUnique",
      [

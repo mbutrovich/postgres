@@ -713,7 +713,7 @@ ExecInitBitmapHeapScan(BitmapHeapScan *node, EState *estate, int eflags)
 	BitmapHeapScanState *scanstate;
 	Relation	currentRelation;
 
-        TS_EXECUTOR_FEATURES(BitmapHeapScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(BitmapHeapScan, node->scan);
 
 	/* check for unsupported flags */
 	Assert(!(eflags & (EXEC_FLAG_BACKWARD | EXEC_FLAG_MARK)));

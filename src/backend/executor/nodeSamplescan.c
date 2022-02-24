@@ -102,7 +102,7 @@ ExecInitSampleScan(SampleScan *node, EState *estate, int eflags)
 	TableSampleClause *tsc = node->tablesample;
 	TsmRoutine *tsm;
 
-        TS_EXECUTOR_FEATURES(SampleScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(SampleScan, node->scan);
 
 	Assert(outerPlan(node) == NULL);
 	Assert(innerPlan(node) == NULL);

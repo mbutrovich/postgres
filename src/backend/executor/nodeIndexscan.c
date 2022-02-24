@@ -908,7 +908,7 @@ ExecInitIndexScan(IndexScan *node, EState *estate, int eflags)
 	Relation	currentRelation;
 	LOCKMODE	lockmode;
 
-        TS_EXECUTOR_FEATURES(IndexScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(IndexScan, node->scan);
 
 	/*
 	 * create state structure

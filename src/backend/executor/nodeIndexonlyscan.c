@@ -502,7 +502,7 @@ ExecInitIndexOnlyScan(IndexOnlyScan *node, EState *estate, int eflags)
 	LOCKMODE	lockmode;
 	TupleDesc	tupDesc;
 
-        TS_EXECUTOR_FEATURES(IndexOnlyScan, node->scan.plan);
+        TS_EXECUTOR_SCAN_FEATURES(IndexOnlyScan, node->scan);
 
 	/*
 	 * create state structure

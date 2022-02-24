@@ -450,10 +450,10 @@ def processor(ou, buffered_strings, table_stats, outdir, append):
     # Open output file, with the name based on the OU.
     with open(file_path, mode=file_mode, encoding="utf-8") as file:
         if file_mode == "w":
-            if ou.name() == "ExecModifyTable":
-                file.write(
-                    "n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum,"
-                )
+            # if ou.name() == "ExecModifyTable":
+            #     file.write(
+            #         "n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum,"
+            #     )
             # Write the OU's feature columns for CSV header,
             # with an additional separator before resource metrics columns.
             file.write(ou.features_columns() + ",")
@@ -467,10 +467,10 @@ def processor(ou, buffered_strings, table_stats, outdir, append):
             # Write serialized training data points from shared queue to file.
             while True:
                 string = buffered_strings.get()
-                if ou.name() == "ExecModifyTable":
-                    file.write(table_stats["16385"] + string)
-                else:
-                    file.write(string)
+                # if ou.name() == "ExecModifyTable":
+                #     file.write(table_stats["16385"] + string)
+                # else:
+                file.write(string)
 
         except KeyboardInterrupt:
             logger.info("Processor for %s caught KeyboardInterrupt.", ou.name())

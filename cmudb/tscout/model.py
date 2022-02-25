@@ -57,8 +57,12 @@ class BPFVariable:
         Some variables should not be output, e.g., pointers,
         as the values do not make sense from a ML perspective.
         """
-        suppressed = {clang.cindex.TypeKind.POINTER, clang.cindex.TypeKind.FUNCTIONPROTO,
-                      clang.cindex.TypeKind.INCOMPLETEARRAY, clang.cindex.TypeKind.CONSTANTARRAY}
+        suppressed = {
+            clang.cindex.TypeKind.POINTER,
+            clang.cindex.TypeKind.FUNCTIONPROTO,
+            clang.cindex.TypeKind.INCOMPLETEARRAY,
+            clang.cindex.TypeKind.CONSTANTARRAY,
+        }
         return self.c_type not in suppressed
 
     def serialize(self, output_event):

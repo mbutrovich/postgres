@@ -164,7 +164,7 @@ def generate_markers(operation, ou_index, reagents_used):
     return markers_c
 
 
-def collector(collector_flags, ou_processor_queues, pid, socket_fd):
+def collector(collector_flags, table_stats, ou_processor_queues, pid, socket_fd):
     setproctitle.setproctitle(f"{pid} TScout Collector")
 
     # Read the C code for the Collector.
@@ -240,9 +240,29 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
             # pylint: disable=unused-argument
             raw_data = collector_bpf[output_buffer].event(data)
             operating_unit = operating_units[raw_data.ou_index]
-            event_features = operating_unit.serialize_features(
-                raw_data
-            )  # TODO(Matt): consider moving serialization to CSV string to Processor
+
+            if operating_unit.name() in {
+                "ExecBitmapHeapScan",
+                "ExecBitmapIndexScan",
+                "ExecIndexOnlyScan",
+                "ExecIndexScan",
+                "ExecModifyTable",
+                "ExecSampleScan",
+                "ExecSeqScan",
+                "ExecTidRangeScan",
+                "ExecTidScan",
+            }:
+                table_oid = str(raw_data.target_table_oid)
+                # print(table_oid)
+                target_table_stats = table_stats[table_oid] + ","
+                # print(target_table_stats)
+                event_features = target_table_stats + operating_unit.serialize_features(
+                    raw_data
+                )  # TODO(Matt): consider moving serialization to CSV string to Processor
+            else:
+                event_features = operating_unit.serialize_features(
+                    raw_data
+                )  # TODO(Matt): consider moving serialization to CSV string to Processor
             training_data = "".join(
                 [event_features, ",", ",".join(metric.serialize(raw_data) for metric in metrics), "\n"]
             )
@@ -431,12 +451,13 @@ def settings_collector(table_stats, shutdown):
             except KeyboardInterrupt:
                 logger.info("Userspace Collector caught KeyboardInterrupt.")
             except Exception as e:  # pylint: disable=broad-except
+                # TODO(Matt): If postgres shuts down the connection closes and we get an exception for that.
                 logger.warning("Userspace Collector caught %s.", e)
 
     logger.info("Userspace Collector shut down.")
 
 
-def processor(ou, buffered_strings, table_stats, outdir, append):
+def processor(ou, buffered_strings, outdir, append):
     setproctitle.setproctitle(f"TScout Processor {ou.name()}")
 
     file_path = f"{outdir}/{ou.name()}.csv"
@@ -450,10 +471,20 @@ def processor(ou, buffered_strings, table_stats, outdir, append):
     # Open output file, with the name based on the OU.
     with open(file_path, mode=file_mode, encoding="utf-8") as file:
         if file_mode == "w":
-            # if ou.name() == "ExecModifyTable":
-            #     file.write(
-            #         "n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum,"
-            #     )
+            if ou.name() in {
+                "ExecBitmapHeapScan",
+                "ExecBitmapIndexScan",
+                "ExecIndexOnlyScan",
+                "ExecIndexScan",
+                "ExecModifyTable",
+                "ExecSampleScan",
+                "ExecSeqScan",
+                "ExecTidRangeScan",
+                "ExecTidScan",
+            }:
+                file.write(
+                    "n_tup_ins,n_tup_upd,n_tup_del,n_tup_hot_upd,n_live_tup,n_dead_tup,n_mod_since_analyze,n_ins_since_vacuum,"
+                )
             # Write the OU's feature columns for CSV header,
             # with an additional separator before resource metrics columns.
             file.write(ou.features_columns() + ",")
@@ -467,9 +498,6 @@ def processor(ou, buffered_strings, table_stats, outdir, append):
             # Write serialized training data points from shared queue to file.
             while True:
                 string = buffered_strings.get()
-                # if ou.name() == "ExecModifyTable":
-                #     file.write(table_stats["16385"] + string)
-                # else:
                 file.write(string)
 
         except KeyboardInterrupt:
@@ -542,7 +570,7 @@ def main():
             ou_processor_queues.append(ou_processor_queue)
             ou_processor = mp.Process(
                 target=processor,
-                args=(ou, ou_processor_queue, table_stats, outdir, append),
+                args=(ou, ou_processor_queue, outdir, append),
             )
             ou_processor.start()
             ou_processors.append(ou_processor)
@@ -563,7 +591,7 @@ def main():
             logger.info("Postmaster forked PID %s, creating its Collector.", child_pid)
             collector_flags[child_pid] = True
             collector_process = mp.Process(
-                target=collector, args=(collector_flags, ou_processor_queues, child_pid, socket_fd)
+                target=collector, args=(collector_flags, table_stats, ou_processor_queues, child_pid, socket_fd)
             )
             collector_process.start()
             collector_processes[child_pid] = collector_process

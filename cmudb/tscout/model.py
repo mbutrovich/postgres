@@ -464,8 +464,7 @@ OU_DEFS = [
          Feature("ModifyTable"),
          LEFT_CHILD_NODE_ID,
          RIGHT_CHILD_NODE_ID,
-         STATEMENT_TIMESTAMP,
-         TARGET_TABLE_OID
+         STATEMENT_TIMESTAMP
      ]),
     ("ExecNamedTuplestoreScan",
      [

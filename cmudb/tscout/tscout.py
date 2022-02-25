@@ -246,7 +246,6 @@ def collector(collector_flags, table_stats, ou_processor_queues, pid, socket_fd)
                 "ExecBitmapIndexScan",
                 "ExecIndexOnlyScan",
                 "ExecIndexScan",
-                "ExecModifyTable",
                 "ExecSampleScan",
                 "ExecSeqScan",
                 "ExecTidRangeScan",
@@ -433,7 +432,7 @@ def settings_collector(table_stats, shutdown):
 
     setproctitle.setproctitle("TScout Userspace Collector")
 
-    with psycopg.connect("host=localhost port=5432 dbname=test user=matt", autocommit=True) as connection:
+    with psycopg.connect("host=localhost port=5432 dbname=benchbase user=matt", autocommit=True) as connection:
         # Poll on the Collector's output buffer until Collector is shut down.
         while not shutdown.is_set():
             try:
@@ -476,7 +475,6 @@ def processor(ou, buffered_strings, outdir, append):
                 "ExecBitmapIndexScan",
                 "ExecIndexOnlyScan",
                 "ExecIndexScan",
-                "ExecModifyTable",
                 "ExecSampleScan",
                 "ExecSeqScan",
                 "ExecTidRangeScan",

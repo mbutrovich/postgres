@@ -241,7 +241,8 @@ REAGENTS = {
 QUERY_ID = Feature("QueryId", readarg_p=False,
                    bpf_tuple=(BPFVariable(name="query_id", c_type=clang.cindex.TypeKind.LONG),))
 LEFT_CHILD_NODE_ID = Feature("left_child_plan_node_id", readarg_p=False,
-                             bpf_tuple=(BPFVariable(name="left_child_plan_node_id", c_type=clang.cindex.TypeKind.INT),))
+                             bpf_tuple=(BPFVariable(name="left_child_plan_node_id", c_type=clang.cindex.TypeKind.INT,
+                                                    alignment=8),))
 RIGHT_CHILD_NODE_ID = Feature("right_child_plan_node_id", readarg_p=False,
                               bpf_tuple=(
                                   BPFVariable(name="right_child_plan_node_id", c_type=clang.cindex.TypeKind.INT),))
@@ -700,7 +701,7 @@ class OperatingUnit:
             if feature.readarg_p:
                 # This Feature is actually a struct struct that readarg_p will memcpy from user-space.
                 assert len(feature.bpf_tuple) >= 1, "We should have some fields in this struct."
-                # Add all the struct's fields, sticking the original struct's alignment value on the first attribute.
+                # Add all the struct's fields.
                 for column in feature.bpf_tuple:
                     struct_def = struct_def + (
                         f"{CLANG_TO_BPF[column.c_type]} {column.name}{column.alignment_string()};\n"
@@ -709,7 +710,7 @@ class OperatingUnit:
                 # It's a single stack-allocated argument that we can read directly.
                 assert len(feature.bpf_tuple) == 1, "How can something not using readarg_p have multiple fields?"
                 struct_def = struct_def + (
-                    f"{CLANG_TO_BPF[feature.bpf_tuple[0].c_type]} {feature.bpf_tuple[0].name};\n"
+                    f"{CLANG_TO_BPF[feature.bpf_tuple[0].c_type]} {feature.bpf_tuple[0].name}{feature.bpf_tuple[0].alignment_string()};\n"
                 )
 
         return struct_def

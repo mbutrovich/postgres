@@ -214,6 +214,8 @@ def collector(collector_flags, ou_processor_queues, pid, socket_fd):
     if socket_fd:
         cflags.append(f"-DCLIENT_SOCKET_FD={socket_fd}")
 
+    print(collector_c, file=open("./test.c", "w"))
+
     collector_bpf = BPF(text=collector_c, usdt_contexts=[collector_probes], cflags=cflags)
 
     # open perf hardware events for BPF program

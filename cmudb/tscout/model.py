@@ -778,7 +778,7 @@ class Model:
                             if field.pg_type not in REAGENTS
                             else REAGENTS[field.pg_type].return_type,
                             pg_type=field.pg_type,
-                            alignment=field.alignment if i == 0 else None,
+                            alignment=field.alignment,
                         )
                     )
                 except KeyError as e:

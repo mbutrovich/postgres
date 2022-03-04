@@ -112,6 +112,8 @@ void SUBST_OU_features(struct pt_regs *ctx) {
   // Produce any remaining features with defined Reagents.
   SUBST_REAGENTS;
 
+  bpf_trace_printk("%d\n", features->IndexOnlyScan_indexid);
+
   // Store the features, waiting for BEGIN(s), END(s), and FLUSH.
   s32 ou_instance = 0;
   bpf_usdt_readarg(1, ctx, &ou_instance);
@@ -138,6 +140,8 @@ void SUBST_OU_flush(struct pt_regs *ctx) {
     return;
   }
 
+  bpf_trace_printk("%d\n", features->IndexOnlyScan_indexid);
+
   struct resource_metrics *flush_metrics = NULL;
   flush_metrics = complete_metrics.lookup(&key);
   if (flush_metrics == NULL) {
@@ -145,6 +149,8 @@ void SUBST_OU_flush(struct pt_regs *ctx) {
     SUBST_OU_reset(ou_instance);
     return;
   }
+
+  bpf_trace_printk("%d\n", flush_metrics->cpu_cycles);
 
   // Fetch scratch output struct.
   int idx = 0;
@@ -161,6 +167,9 @@ void SUBST_OU_flush(struct pt_regs *ctx) {
 
   // Copy completed metrics to output struct.
   __builtin_memcpy(&(output->SUBST_FIRST_METRIC), flush_metrics, sizeof(struct resource_metrics));
+
+  bpf_trace_printk("%d\n", output->IndexOnlyScan_indexid);
+  bpf_trace_printk("%d\n", output->cpu_cycles);
 
   // Set the index of this SUBST_OU so the Collector knows which Processor to send this data point to.
   output->ou_index = SUBST_INDEX;
